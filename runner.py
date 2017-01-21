@@ -3,16 +3,17 @@ from deap import base, tools
 from deap import creator
 from deap.tools import HallOfFame
 import matplotlib.pyplot as plt
-
+import config as CONFIG
 from puzzle import Puzzle
 
 
 class Runner():
 
-  def __init__(self, lines):
+  def __init__(self, lines, pid):
     self.toolbox = base.Toolbox()
     self.lines = lines
     self.create_index = 0
+    self.pid = pid
 
     creator.create("FitnessMax", base.Fitness, weights=(-1.0,))
     creator.create("Puzzle", Puzzle, fitness=creator.FitnessMax)
@@ -60,18 +61,18 @@ class Runner():
     labs = [l.get_label() for l in lns]
     ax1.legend(lns, labs, bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
                ncol=2, mode="expand", borderaxespad=0.)
-    plt.savefig("gen/puzles_fitness.png", bbox_inches='tight', dpi=100)
+    plt.savefig("gen/%s/puzles_fitness.png" % self.pid, bbox_inches='tight', dpi=100)
     plt.show()
 
 
   def get_args_lines_index(self):
     t = self.create_index
     self.create_index += 1
-    return (t, self.lines)
+    return (t, self.lines, self.pid)
 
 
   def get_population(self, verbose):
-    pop = self.toolbox.population(n=10)
+    pop = self.toolbox.population(n=CONFIG.NPOPULATION)
 
     # Evaluate the entire population
     self.eval(pop, verbose=True)
@@ -90,7 +91,7 @@ class Runner():
     record = self.stats.compile(pop)
     self.logbook.record(eval=0, population=pop, **record)
     self.famous.update(pop)
-    for i in range(1, kwargs.get("evals", 10)):
+    for i in range(1, kwargs.get("evals", CONFIG.NGEN)):
 
       for puzzle in pop:
         puzzle.select()

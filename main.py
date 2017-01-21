@@ -46,12 +46,13 @@ def print_pop(pop, elem=None):
   for row in pop:
     temp = print_row(row, _elem=temp)
 
-def load_population():
+def load_population(pid):
   f = _load_file(config.population_file_saved)
   if f != None:
     return f
   f = _load_file(config.population_file_base)
-  return Runner(f)
+  f = [[int(y) for y in x.split()] for x in f]
+  return Runner(f, pid)
 
 def run_population(toolbox, pop):
 
@@ -91,18 +92,19 @@ def run_population(toolbox, pop):
   # return pop
 
 
+def create_subdir(pid):
+  try:
+    os.mkdir("gen/%s/" % pid)
+    os.mkdir("gen/%s/puzzles" % pid)
+  except Exception as e:
+    print e
+
 
 def main():
-  runner = load_population()
+  pid = os.getpid()
+  create_subdir(pid)
+  runner = load_population(pid)
   runner(verbose=True)
-
-  gen = runner.logbook.select("eval")
-  runner.logbook.header = "avg", "max"
-  fit_max = runner.logbook.select("max")
-  fit_avg = runner.logbook.select("avg")
-  #size_avgs = runner.logbook.chapters["size"].select("avg")
-  generate_graph(gen, fit_max, fit_avg)
-
 
 
 if __name__ == '__main__':

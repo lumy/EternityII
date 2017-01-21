@@ -9,6 +9,7 @@ from deap import tools
 
 from eval import eval_solution
 
+
 class HoldLine(object):
 
   def __init__(self, f, arr):
@@ -37,14 +38,37 @@ class Puzzle(object):
     plt.ylabel("weight")
     plt.xlabel("population")
     plt.gcf().set_size_inches(15, 5)
-    plt.savefig("gen/puzzles/p_%s_g_%s.png" % (self.uid, ngen), bbox_inches='tight', dpi=100)
+    plt.savefig("gen/%s/puzzles/p_%s_g_%s.png" % (self.pid, self.uid, ngen), bbox_inches='tight', dpi=100)
     plt.clf()
     plt.close()
 
-  def randomize_lines(self):
+  def give_random_pos(self, pos, line):
+    r = []
+    for x in range(0, len(pos)):
+      rp =  random.randrange(0, len(pos))
+      rl = random.randrange(0, len(line))
+      r.append((pos.pop(rp),line.pop(rl)))
+    return r
+
+  def randomize_lines(self, lines):
+    """
+      Trying to have an half randomize algorithm
+    :return:
+    """
+    CORNER_POS = [0, 15, 240, 255]
+    BORDER_POS = range(1, 15) + range(241, 255) + [16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224,
+                                                  31, 47, 63, 79, 95, 111, 127, 143, 159, 175, 191, 207, 223, 239]
+    INSIDE_POS = [x for x in range(0, 255) if x not in CORNER_POS and x not in BORDER_POS]
+    corner = [l for l in lines if l.count(0) == 2]
+    border = [l for l in lines if l.count(0) == 1]
+    inside = [l for l in lines if l.count(0) == 0]
+    lc = self.give_random_pos(CORNER_POS, corner)
+    lb = self.give_random_pos(BORDER_POS, border)
+    li = self.give_random_pos(INSIDE_POS, inside)
+    l = lc + lb + li
+    f = lambda lst, index, c: lst[c][1] if lst[c][0] == index else f(lst, index, c + 1)
     for x in xrange(0, 256):
-      l = random.randrange(0, len(self.lines))
-      yield self.lines.pop(l)
+      yield f(l, x, 0)
 
   def gen_ind(self, arr):
     c = arr[self.create_index]
@@ -52,9 +76,9 @@ class Puzzle(object):
     return c, self.create_index
 
   def __init__(self, f):
-    uid, lines = f()
-    self.lines = copy.copy(lines)
+    uid, lines, pid = f()
     self.uid = uid
+    self.pid = pid
 
     self.toolbox = base.Toolbox()
     # Used by creator.Individual
@@ -64,7 +88,8 @@ class Puzzle(object):
     creator.create("Individual", HoldLine, weight=creator.WeightMax)
 
     #Should be Optimized to put corner at the corner etc...
-    arr = [[int(l) for l in line.split()] for line in self.randomize_lines()]
+    arr = [line for line in self.randomize_lines(copy.copy(lines))]
+    print "Array Done"
     self.toolbox.register("individual", creator.Individual, self.gen_ind, arr) # , arr)
     self.toolbox.register("desk", tools.initRepeat, list, self.toolbox.individual)
     self.population = self.toolbox.desk(n=len(arr)) # numpy.array(arr, dtype=list, order="F")
@@ -154,7 +179,6 @@ class Puzzle(object):
     for x in missing_element: x.position = -1
     self.set_new_position(missing_element, pos)
 
-
   def mutate(self, indpb=0.0):
     """
     Based on deap.tools.mutShuffleIndexes
@@ -185,3 +209,6 @@ class Puzzle(object):
           swap_indx += 1
         self.population[i], self.population[swap_indx] = \
           self.population[swap_indx], self.population[i]
+
+#def Test_Random(lst, index, c=0):
+#  f = lambda lst, index, c: list[c][1] if lst[c][0] == index else f(lst, index, c + 1)
