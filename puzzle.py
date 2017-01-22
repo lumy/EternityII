@@ -2,29 +2,43 @@ import random
 import copy
 import matplotlib.pyplot as plt
 import numpy
-import array
+import os
+
+import statistics
 from deap import base
 from deap import creator
 from deap import tools
 
 from eval import eval_solution
 
+CORNER_POS = [0, 15, 240, 255]
+BORDER_POS = range(1, 15) + range(241, 255) + [16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224,
+                                                 31, 47, 63, 79, 95, 111, 127, 143, 159, 175, 191, 207, 223, 239]
+INSIDE_POS = [x for x in range(0, 255) if x not in CORNER_POS and x not in BORDER_POS]
+
+def create_subdir(s):
+  try:
+    os.mkdir(s)
+  except Exception as e:
+    print e
+
 
 class HoldLine(object):
 
   def __init__(self, f, arr):
-    self.content, self.position = f(arr)
+    self.content = f(arr)
   def __getitem__(self, item):
     return copy.copy(self.content[item])
   def __setitem__(self, key, value):
     self.content[key] = value
+  def count(self, obj):
+    return len([x for x in self.content if x == obj])
 
 
 class Puzzle(object):
   """
   Represant the game. Contain a population of each and get One fitnessValue.
   """
-
   def generate_graph_values(self, ngen=0):  # , size_avgs):
     nrow = [0, None, -1.0, 1.0]
     #[-100, -75, -50, -25, 0, 25, 50, 75, 100]
@@ -38,9 +52,13 @@ class Puzzle(object):
     plt.ylabel("weight")
     plt.xlabel("population")
     plt.gcf().set_size_inches(15, 5)
-    plt.savefig("gen/%s/puzzles/p_%s_g_%s.png" % (self.pid, self.uid, ngen), bbox_inches='tight', dpi=100)
+    plt.savefig("gen/%s/puzzles/p_%s/g_%s.png" % (self.pid, self.uid, ngen), bbox_inches='tight', dpi=100)
     plt.clf()
     plt.close()
+
+  def writeLogbook(self):
+    with open("gen/%s/puzzles/logbook_%s.txt" % (self.pid, self.uid), "w") as f:
+      f.write(str(self.logbook))
 
   def give_random_pos(self, pos, line):
     r = []
@@ -50,21 +68,14 @@ class Puzzle(object):
       r.append((pos.pop(rp),line.pop(rl)))
     return r
 
-  def randomize_lines(self, lines):
+  def randomize_lines(self, lc, lb, li):
     """
       Trying to have an half randomize algorithm
     :return:
     """
-    CORNER_POS = [0, 15, 240, 255]
-    BORDER_POS = range(1, 15) + range(241, 255) + [16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224,
-                                                  31, 47, 63, 79, 95, 111, 127, 143, 159, 175, 191, 207, 223, 239]
-    INSIDE_POS = [x for x in range(0, 255) if x not in CORNER_POS and x not in BORDER_POS]
-    corner = [l for l in lines if l.count(0) == 2]
-    border = [l for l in lines if l.count(0) == 1]
-    inside = [l for l in lines if l.count(0) == 0]
-    lc = self.give_random_pos(CORNER_POS, corner)
-    lb = self.give_random_pos(BORDER_POS, border)
-    li = self.give_random_pos(INSIDE_POS, inside)
+    lc = self.give_random_pos(copy.copy(CORNER_POS), lc)
+    lb = self.give_random_pos(copy.copy(BORDER_POS), lb)
+    li = self.give_random_pos(copy.copy(INSIDE_POS), li)
     l = lc + lb + li
     f = lambda lst, index, c: lst[c][1] if lst[c][0] == index else f(lst, index, c + 1)
     for x in xrange(0, 256):
@@ -73,13 +84,13 @@ class Puzzle(object):
   def gen_ind(self, arr):
     c = arr[self.create_index]
     self.create_index += 1
-    return c, self.create_index
+    return c
 
   def __init__(self, f):
     uid, lines, pid = f()
     self.uid = uid
     self.pid = pid
-
+    create_subdir("gen/%s/puzzles/p_%s" % (self.pid, self.uid))
     self.toolbox = base.Toolbox()
     # Used by creator.Individual
     self.create_index = 0
@@ -88,8 +99,8 @@ class Puzzle(object):
     creator.create("Individual", HoldLine, weight=creator.WeightMax)
 
     #Should be Optimized to put corner at the corner etc...
-    arr = [line for line in self.randomize_lines(copy.copy(lines))]
-    print "Array Done"
+    arr = [line for line in self.randomize_lines(*lines)]
+
     self.toolbox.register("individual", creator.Individual, self.gen_ind, arr) # , arr)
     self.toolbox.register("desk", tools.initRepeat, list, self.toolbox.individual)
     self.population = self.toolbox.desk(n=len(arr)) # numpy.array(arr, dtype=list, order="F")
@@ -102,23 +113,20 @@ class Puzzle(object):
 
     #
     self.stats = tools.Statistics(key=lambda ind: ind.weight.value)
-    self.stats.register("avg", numpy.mean)
+    self.stats.register("avg", statistics.mean)
     self.stats.register("std", numpy.std)
-    self.stats.register("min", numpy.min)
-    self.stats.register("max", numpy.max)
+    self.stats.register("min", min)
+    self.stats.register("max", max)
+    self.stats.register("median", statistics.median)
     self.logbook = tools.Logbook()
     self.logbook.header = "generation", "fitness", "min", "avg", "max"
+    self.record = None
 
   def __len__(self):
     return len(self.content)
 
-  # def __getitem__(self, item):
-  #   return copy.copy(self.population[item])
-  # def __setitem__(self, key, value):
-  #   self.population[key] = value
-
   def __repr__(self):
-    return repr(self.values)
+    return repr(self.uid)
 
   def get_other_values(self):
     return self.values
@@ -127,57 +135,50 @@ class Puzzle(object):
     self.values, n = eval_solution(self.population)
     for ind, v in zip(self.population, self.values):
       ind.weight.value = v
-    record = self.stats.compile(self.population)
-    self.logbook.record(eval=eval, population=self.population, **record)
+    self.record = self.stats.compile(self.population)
+    self.logbook.record(eval=eval, population=self.population, **self.record)
     return n,
 
-  def _get_mins_weight_pop(self, n, bad_pop):
-    """
-      Select n element in bad pop
-    :param bad_pop:
-    :return:
-    """
-    ret = []
-    for i in range(0, n):
-      index = random.randrange(0, len(bad_pop))
-      ret.append(bad_pop.pop(index))
-    return ret
-
-  def get_mins_weight(self, n):
+  def get_mins_weight(self, weight):
     """
       Take Random Min Weight
     :param n:
     :return:
     """
-    #pop = copy.copy(self.population)
-    e = min(self.population, key=lambda x: x.weight.value)
-    bad_pop = [x for x in self.population if x.weight.value == e.weight.value]
-    if len(bad_pop) > n:
-      bad_pop = self._get_mins_weight_pop(n, bad_pop)
-    elif len(bad_pop) < n:
-      print "Not Enough Bad weigth going for the next bad weight"
-      exit(0)
-    #self.population = [ind for ind in self.population if ind not in bad_pop]
-    for ind in bad_pop:
-      ind.weight.value = None
-    return bad_pop
+    bad_pop = [x for x in self.population if x.weight.value <= weight]
+    bad_pop_inside = [ind for ind in bad_pop if ind.count(0) == 0]
+    bad_pop_border = [ind for ind in bad_pop if ind.count(0) == 1]
+    bad_pop_corner = [ind for ind in bad_pop if ind.count(0) == 2]
+    return bad_pop_corner, bad_pop_border, bad_pop_inside
 
   def set_new_position(self, elems, pos):
+    new_pop = copy.copy(self.population)
+    for elem in elems:
+
+      new_pop.pop(new_pop.index(elem))
     for elem in elems:
       c = random.randrange(0, len(pos))
-      elem.position = pos[c]
+      new_pop.insert(pos[c], elem)
       pos.pop(c)
+    self.population = new_pop
 
-  def select(self, nselect=30):
+  def select(self):
     """
       This fonction should select X Individual that have the worst weight/Fitness
       They should be selected to be reset at different position
     :return:
     """
-    missing_element = self.get_mins_weight(40)
-    pos = [x.position for x in missing_element]
-    for x in missing_element: x.position = -1
-    self.set_new_position(missing_element, pos)
+    def func(bp):
+      if len(bp) > 0:
+        pos = [self.population.index(x) for x in bp]
+        self.set_new_position(bp, pos)
+      else:
+        print "Not Enough population to interchange", bp
+    weight = -0.50 if self.record['avg'] >= -0.75 else -0.75
+    bpc, bpb, bpi = self.get_mins_weight(weight)
+    func(bpc)
+    func(bpb)
+    func(bpi)
 
   def mutate(self, indpb=0.0):
     """

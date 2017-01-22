@@ -5,13 +5,14 @@ from deap.tools import HallOfFame
 import matplotlib.pyplot as plt
 import config as CONFIG
 from puzzle import Puzzle
-
+import copy
+import statistics
 
 class Runner():
 
-  def __init__(self, lines, pid):
+  def __init__(self, lines, pid,):
     self.toolbox = base.Toolbox()
-    self.lines = lines
+    self.lc, self.lb, self.li = lines
     self.create_index = 0
     self.pid = pid
 
@@ -28,15 +29,15 @@ class Runner():
 
     #
     self.stats = tools.Statistics(key=lambda ind: ind.fitness.values)
-    stats_size = tools.Statistics(key=lambda ind: ind.get_other_values())
+    #stats_size = tools.Statistics(key=lambda ind: ind.get_other_values())
 #    self.mstats = tools.MultiStatistics(fitness=stats_fit, content=stats_size)
     self.stats.register("avg", numpy.mean)
     self.stats.register("std", numpy.std)
-    self.stats.register("min", numpy.min)
-    self.stats.register("max", numpy.max)
+    self.stats.register("min", min)
+    self.stats.register("max", max)
     self.logbook = tools.Logbook()
 
-    self.logbook.header = "eval", "fitness", "min", "avg", "max"
+    self.logbook.header = "eval", "select", "mutate", "fitness", "min", "avg", "max"
 
     maxsize = 10
     self.famous = HallOfFame(maxsize)
@@ -68,12 +69,11 @@ class Runner():
   def get_args_lines_index(self):
     t = self.create_index
     self.create_index += 1
-    return (t, self.lines, self.pid)
+    return (t, (copy.copy(self.lc), copy.copy(self.lb), copy.copy(self.li)), self.pid)
 
 
   def get_population(self, verbose):
     pop = self.toolbox.population(n=CONFIG.NPOPULATION)
-
     # Evaluate the entire population
     self.eval(pop, verbose=True)
     return pop
@@ -87,7 +87,6 @@ class Runner():
 
   def __call__(self, *args, **kwargs):
     pop = self.get_population(kwargs.get("verbose", False))
-
     record = self.stats.compile(pop)
     self.logbook.record(eval=0, population=pop, **record)
     self.famous.update(pop)
@@ -97,13 +96,25 @@ class Runner():
         puzzle.select()
       self.eval(pop, eval=i, verbose=True)
 
+      record = self.stats.compile(pop)
+      self.logbook.record(eval=i, select=True, population=pop, **record)
+
       for ind in pop:
+        #"""
+        #  Think About the mutate method
+        #"""
         self.toolbox.mutate(ind)
+
+      #"""
+      #    The crossover method should be taking Zone of big score (like 9 having a great score together and
+      #       putting them at the same position in another puzzle. the ind of the puzzle that has been taking
+      #       spaces should take the free new one randomly.
+      #"""
 
       self.eval(pop, eval=i, verbose=True)
 
       record = self.stats.compile(pop)
-      self.logbook.record(eval=i, population=pop, **record)
+      self.logbook.record(eval=i, mutate=True, population=pop, **record)
       self.famous.update(pop)
 
     print(self.logbook)
@@ -112,6 +123,9 @@ class Runner():
     fit_max = self.logbook.select("max")
     fit_avg = self.logbook.select("avg")
     self.generate_graph(gen, fit_max, fit_avg)
+    map(lambda x: x.writeLogbook(), pop)
+    with open("gen/%s/logbook.txt" % self.pid, "w") as f:
+      f.write(str(self.logbook))
     #logbook.chapters["content"].select("all")
 
 
