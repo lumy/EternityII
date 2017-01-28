@@ -31,8 +31,6 @@ class Runner():
     self.stats = tools.Statistics(key=lambda ind: ind.fitness.values)
     #stats_size = tools.Statistics(key=lambda ind: ind.get_other_values())
 #    self.mstats = tools.MultiStatistics(fitness=stats_fit, content=stats_size)
-    self.stats.register("avg", numpy.mean)
-    self.stats.register("std", numpy.std)
     self.stats.register("min", min)
     self.stats.register("max", max)
     self.logbook = tools.Logbook()
@@ -53,8 +51,8 @@ class Runner():
       tl.set_color("b")
 
     ax2 = ax1.twinx()
-    line2 = ax2.plot(gen, fit_avgs, "r.", label="Average Fitness")
-    ax2.set_ylabel("Size", color="r")
+    line2 = ax2.plot(gen, fit_avgs, "r.", label="Min Fitness")
+    ax2.set_ylabel("Fitness", color="r")
     for tl in ax2.get_yticklabels():
       tl.set_color("r")
 
@@ -87,17 +85,13 @@ class Runner():
 
   def __call__(self, *args, **kwargs):
     pop = self.get_population(kwargs.get("verbose", False))
-    record = self.stats.compile(pop)
-    self.logbook.record(eval=0, population=pop, **record)
-    self.famous.update(pop)
+
     for i in range(1, kwargs.get("evals", CONFIG.NGEN)):
 
       for puzzle in pop:
         puzzle.select()
       self.eval(pop, eval=i, verbose=True)
 
-      record = self.stats.compile(pop)
-      self.logbook.record(eval=i, select=True, population=pop, **record)
 
       for ind in pop:
         #"""
@@ -121,7 +115,7 @@ class Runner():
     gen = self.logbook.select("eval")
     self.logbook.header = "avg", "max"
     fit_max = self.logbook.select("max")
-    fit_avg = self.logbook.select("avg")
+    fit_avg = self.logbook.select("min")
     self.generate_graph(gen, fit_max, fit_avg)
     map(lambda x: x.writeLogbook(), pop)
     with open("gen/%s/logbook.txt" % self.pid, "w") as f:
