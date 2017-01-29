@@ -126,7 +126,6 @@ class Puzzle(object):
     :param type: list of None and 0 for direction to fit.
     :return:
     """
-    print "Start ", ind, type
     while not ind.mask(type):
       ind.rotate()
 
@@ -242,6 +241,7 @@ class Puzzle(object):
           swap_indx += 1
         self.population[i], self.population[swap_indx] = \
           self.population[swap_indx], self.population[i]
+
 
 if __name__ == '__main__':
   import ind
