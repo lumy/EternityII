@@ -14,8 +14,17 @@ import ind
 from eval import eval_solution
 
 CORNER_POS = [0, 15, 240, 255]
-BORDER_POS = range(1, 15) + range(241, 255) + [16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224,
-                                                 31, 47, 63, 79, 95, 111, 127, 143, 159, 175, 191, 207, 223, 239]
+MASK_CORNERS = [[0, None, None, 0], [0, 0, None, None], [None, None, 0, 0], [None, 0, 0, None]]
+BORDER_TOP = range(1, 15)
+BORDER_BOT = range(241, 255)
+BODER_LEFT = [31, 47, 63, 79, 95, 111, 127, 143, 159, 175, 191, 207, 223, 239]
+BORDER_RIGHT = [16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224]
+BORDER_POS = BORDER_TOP + BORDER_BOT + BODER_LEFT + BORDER_RIGHT
+MASK_TOP = [0, None, None, None]
+MASK_BOT = [None, None, 0, None]
+MASK_LEFT = [None, 0, None, None]
+MASK_RIGHT = [None, None, None, 0]
+
 INSIDE_POS = [x for x in range(0, 255) if x not in CORNER_POS and x not in BORDER_POS]
 
 def create_subdir(s):
@@ -46,6 +55,20 @@ class Puzzle(object):
     self.toolbox.register("individual", creator.Individual, self._get_line_, arr)
     self.toolbox.register("desk", tools.initRepeat, list, self.toolbox.individual)
     self.population = self.toolbox.desk(n=len(arr)) # numpy.array(arr, dtype=list, order="F")
+
+
+    # N E S W
+
+    for index, mask in zip(CORNER_POS, MASK_CORNERS):
+      self.fit_to_border(self.population[index], mask)
+    for index in BORDER_BOT:
+      self.fit_to_border(self.population[index], MASK_BOT)
+    for index in BORDER_TOP:
+      self.fit_to_border(self.population[index], MASK_TOP)
+    for index in BODER_LEFT:
+      self.fit_to_border(self.population[index], MASK_LEFT)
+    for index in BORDER_RIGHT:
+      self.fit_to_border(self.population[index], MASK_RIGHT)
 
     # toolbox.register("mate", tools.cxTwoPoint)
     # Using this muttation for now. May change for ourself.
@@ -96,7 +119,18 @@ class Puzzle(object):
     with open("gen/%s/puzzles/logbook_%s.txt" % (self.pid, self.uid), "w") as f:
       f.write(str(self.logbook))
 
-  def give_random_pos(self, pos, line):
+  def fit_to_border(self, ind, type):
+    """
+      Rotate the pieces until it feet with the border.
+    :param ind:
+    :param type: list of None and 0 for direction to fit.
+    :return:
+    """
+    print "Start ", ind, type
+    while not ind.mask(type):
+      ind.rotate()
+
+  def give_random_pos(self, pos, line, mask=None):
     r = []
     for x in range(0, len(pos)):
       rp =  random.randrange(0, len(pos))
@@ -208,10 +242,6 @@ class Puzzle(object):
           swap_indx += 1
         self.population[i], self.population[swap_indx] = \
           self.population[swap_indx], self.population[i]
-
-#def Test_Random(lst, index, c=0):
-#  f = lambda lst, index, c: list[c][1] if lst[c][0] == index else f(lst, index, c + 1)
-
 
 if __name__ == '__main__':
   import ind
