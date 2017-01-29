@@ -31,6 +31,23 @@ class Ind(object):
   def __setitem__(self, key, value):
     self.content[key] = value
 
+  def mask(self, mask):
+    """
+      return True if the mask is ok with the content
+    :param mask: list of None and 0
+    :return:
+    """
+    def _mask(m, c):
+      if c < 4:
+        if m[c] == None:
+          return _mask(m, c + 1)
+        if m[c] == self.content[c]:
+          return _mask(m, c + 1)
+        else:
+          return False
+      return True
+    return _mask(mask, 0)
+
   def count(self, obj):
     """
         Use to count how many occurencences of the color in the current ind
@@ -50,7 +67,11 @@ class Ind(object):
 
 
 if __name__ == '__main__':
-  i = Ind(0, [1, 3, 4, 2])
-  print i
+  i = Ind(lambda x: (0, [1, 0, 0, 17]), None)
+
+  print i.mask([0, 0, None, None])
   i.rotate()
+  print i.mask([0, 0, None, None])
+  i.rotate()
+  print i.mask([0, 0, None, None])
   print i
