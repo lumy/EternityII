@@ -2,6 +2,8 @@ from deap import base, tools
 from deap import creator
 from deap.tools import HallOfFame
 import matplotlib.pyplot as plt
+
+import config
 import config as CONFIG
 import eternity
 from puzzle import Puzzle
@@ -21,46 +23,37 @@ class Runner():
     self.toolbox.register("population", tools.initRepeat, list, self.toolbox.puzzle)
 
     # toolbox.register("mate", tools.cxTwoPoint)
-    # Using this muttation for now. May change for ourself.
-    self.toolbox.register("mutate", lambda x, **kwargs: x.mutate(**kwargs), indpb=0.4)
     # toolbox.register("select", tools.selTournament, tournsize=3)
     self.toolbox.register("evaluate", lambda pop, eval: pop.evaluate(eval=eval))
 
     #
     self.stats = tools.Statistics(key=lambda ind: ind.fitness.values)
-    #stats_size = tools.Statistics(key=lambda ind: ind.get_other_values())
-#    self.mstats = tools.MultiStatistics(fitness=stats_fit, content=stats_size)
-    self.stats.register("min", min)
-    self.stats.register("max", max)
+#    self.stats.register("min", min)
+#    self.stats.register("max", max)
     self.logbook = tools.Logbook()
-
-    self.logbook.header = "eval", "select", "mutate", "fitness", "min", "avg", "max"
+    self.logbook.header = "eval", "population", "fitnesses"
 
     maxsize = 10
     self.famous = HallOfFame(maxsize)
 
-  def generate_graph(self, gen, fit_maxs, fit_avgs):
+  def generate_graph(self, gen, fitnesses):
     # [-100, -75, -50, -25, 0, 25, 50, 75, 100]
-
-    fig, ax1 = plt.subplots()
-    line1 = ax1.plot(gen, fit_maxs, "b.", label="Maximum Fitness")
-    ax1.set_xlabel("Evaluation")
-    ax1.set_ylabel("Fitness", color="b")
-    for tl in ax1.get_yticklabels():
-      tl.set_color("b")
-
-    ax2 = ax1.twinx()
-    line2 = ax2.plot(gen, fit_avgs, "r.", label="Min Fitness")
-    ax2.set_ylabel("Fitness", color="r")
-    for tl in ax2.get_yticklabels():
-      tl.set_color("r")
-
-    lns = line1 + line2
-    labs = [l.get_label() for l in lns]
-    ax1.legend(lns, labs, bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-               ncol=2, mode="expand", borderaxespad=0.)
+    nrow = [0, None, -100.0, 100.0]
+    #[-100, -75, -50, -25, 0, 25, 50, 75, 100]
+    y = 0
+    print gen, fitnesses
+    for x in fitnesses:
+      for _x in x:
+        plt.scatter(y, _x, marker='.', c='c')
+      y += 1
+    plt.axis(nrow)
+    plt.ylabel("weight")
+    plt.xlabel("gen")
+    plt.gcf().set_size_inches(15, 5)
     plt.savefig("gen/%s/puzles_fitness.png" % self.pid, bbox_inches='tight', dpi=100)
     plt.show()
+    plt.clf()
+    plt.close()
 
 
   def get_args_lines_index(self):
@@ -81,49 +74,44 @@ class Runner():
       puzzle.fitness.values = fit
       if verbose:
         puzzle.generate_graph_values(ngen=eval)
+    return fitnesses
+
+  def crossover(self):
+    """
+       The crossover method could be taking Zone of big score (like 9 having a great score together and
+          putting them at the same position in another puzzle. the ind of the puzzle that has been taking
+          spaces should take the free new one randomly.
+    """
+    pass
 
   def __call__(self, *args, **kwargs):
     pop = self.get_population(kwargs.get("verbose", False))
 
-    for i in range(1, kwargs.get("evals", CONFIG.NGEN)):
+    for i in range(0, kwargs.get("evals", CONFIG.NGEN)):
+
+      # We May be Preselecting some puzzle to save and "Reproduce"
 
       for puzzle in pop:
         puzzle.save_picture(gen=i)
         puzzle.select()
-      self.eval(pop, eval=i, verbose=True)
-
-
-      for ind in pop:
-        #"""
-        #  Think About the mutate method
-        #"""
-        self.toolbox.mutate(ind)
-
-      #"""
-      #    The crossover method should be taking Zone of big score (like 9 having a great score together and
-      #       putting them at the same position in another puzzle. the ind of the puzzle that has been taking
-      #       spaces should take the free new one randomly.
-      #"""
-
-      self.eval(pop, eval=i, verbose=True)
-
+        puzzle.mutate(config.mutate_inpd)
+      self.crossover()
+      fitnesses = self.eval(pop, eval=i, verbose=True)
 
       record = self.stats.compile(pop)
-      self.logbook.record(eval=i, mutate=True, population=pop, **record)
+      self.logbook.record(eval=i, fitnesses=fitnesses, population=pop, **record)
       self.famous.update(pop)
 
-    print(self.logbook)
+
+    # Here log the interesting stats.
+
     gen = self.logbook.select("eval")
-    self.logbook.header = "avg", "max"
-    fit_max = self.logbook.select("max")
-    fit_avg = self.logbook.select("min")
-    #self.generate_graph(gen, fit_max, fit_avg)
+    #self.logbook.header = "population"
+    fits = self.logbook.select("fitnesses")
+    self.generate_graph(gen, fits)
     map(lambda x: x.writeLogbook(), pop)
     with open("gen/%s/logbook.txt" % self.pid, "w") as f:
       f.write(str(self.logbook))
-    #eternity.draw(pop[0].get_pieces())
-    #logbook.chapters["content"].select("all")
-
 
 
 
