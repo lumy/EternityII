@@ -9,6 +9,8 @@ from deap import base
 from deap import creator
 from deap import tools
 
+import eternity
+import ind
 from eval import eval_solution
 
 CORNER_POS = [0, 15, 240, 255]
@@ -22,23 +24,57 @@ def create_subdir(s):
   except Exception as e:
     print e
 
-
-class HoldLine(object):
-
-  def __init__(self, f, arr):
-    self.content = f(arr)
-  def __getitem__(self, item):
-    return copy.copy(self.content[item])
-  def __setitem__(self, key, value):
-    self.content[key] = value
-  def count(self, obj):
-    return len([x for x in self.content if x == obj])
-
-
 class Puzzle(object):
   """
   Represant the game. Contain a population of each and get One fitnessValue.
   """
+  def __init__(self, f):
+    uid, lines, pid = f()
+    self.uid = uid
+    self.pid = pid
+    self.index_line = 0
+    self.personal_path = "gen/%s/puzzles/p_%s" % (self.pid, self.uid)
+    create_subdir("gen/%s/puzzles/p_%s" % (self.pid, self.uid))
+    self.toolbox = base.Toolbox()
+
+    creator.create("WeightMax", base.Fitness, weights=(-1.0,))
+    creator.create("Individual", ind.Ind, weight=creator.WeightMax)
+
+    #Should be Optimized to put corner at the corner etc...
+    arr = list(self.randomize_lines(*lines))
+
+    self.toolbox.register("individual", creator.Individual, self._get_line_, arr)
+    self.toolbox.register("desk", tools.initRepeat, list, self.toolbox.individual)
+    self.population = self.toolbox.desk(n=len(arr)) # numpy.array(arr, dtype=list, order="F")
+
+    # toolbox.register("mate", tools.cxTwoPoint)
+    # Using this muttation for now. May change for ourself.
+    # self.toolbox.register("mutate", lambda x, **kwargs: x.mutate(**kwargs), indpb=0.4)
+    # toolbox.register("select", tools.selTournament, tournsize=3)
+    # self.toolbox.register("evaluate", lambda pop: pop.evaluate())
+
+    #
+    self.stats = tools.Statistics(key=lambda ind: ind.weight.value)
+    self.stats.register("avg", statistics.mean)
+    self.stats.register("std", numpy.std)
+    self.stats.register("min", min)
+    self.stats.register("max", max)
+    self.stats.register("median", statistics.median)
+    self.logbook = tools.Logbook()
+    self.logbook.header = "generation", "fitness", "min", "avg", "max"
+    self.record = None
+
+  def _get_line_(self, arr):
+    i = self.index_line
+    self.index_line += 1
+    return arr[i]
+
+  def save_picture(self, gen=0):
+    eternity.save(self.population, "%s/puzzle_g%s" % (self.personal_path, gen))
+
+  def draw(self):
+    eternity.draw(self.population)
+
   def generate_graph_values(self, ngen=0):  # , size_avgs):
     nrow = [0, None, -1.0, 1.0]
     #[-100, -75, -50, -25, 0, 25, 50, 75, 100]
@@ -81,52 +117,14 @@ class Puzzle(object):
     for x in xrange(0, 256):
       yield f(l, x, 0)
 
-  def gen_ind(self, arr):
-    c = arr[self.create_index]
-    self.create_index += 1
-    return c
-
-  def __init__(self, f):
-    uid, lines, pid = f()
-    self.uid = uid
-    self.pid = pid
-    create_subdir("gen/%s/puzzles/p_%s" % (self.pid, self.uid))
-    self.toolbox = base.Toolbox()
-    # Used by creator.Individual
-    self.create_index = 0
-
-    creator.create("WeightMax", base.Fitness, weights=(-1.0,))
-    creator.create("Individual", HoldLine, weight=creator.WeightMax)
-
-    #Should be Optimized to put corner at the corner etc...
-    arr = [line for line in self.randomize_lines(*lines)]
-
-    self.toolbox.register("individual", creator.Individual, self.gen_ind, arr) # , arr)
-    self.toolbox.register("desk", tools.initRepeat, list, self.toolbox.individual)
-    self.population = self.toolbox.desk(n=len(arr)) # numpy.array(arr, dtype=list, order="F")
-
-    # toolbox.register("mate", tools.cxTwoPoint)
-    # Using this muttation for now. May change for ourself.
-    # self.toolbox.register("mutate", lambda x, **kwargs: x.mutate(**kwargs), indpb=0.4)
-    # toolbox.register("select", tools.selTournament, tournsize=3)
-    # self.toolbox.register("evaluate", lambda pop: pop.evaluate())
-
-    #
-    self.stats = tools.Statistics(key=lambda ind: ind.weight.value)
-    self.stats.register("avg", statistics.mean)
-    self.stats.register("std", numpy.std)
-    self.stats.register("min", min)
-    self.stats.register("max", max)
-    self.stats.register("median", statistics.median)
-    self.logbook = tools.Logbook()
-    self.logbook.header = "generation", "fitness", "min", "avg", "max"
-    self.record = None
-
   def __len__(self):
     return len(self.content)
 
   def __repr__(self):
-    return repr(self.uid)
+    return repr(self.uid) + repr(self.population)
+
+  def get_pieces(self):
+    return self.population
 
   def get_other_values(self):
     return self.values
@@ -213,3 +211,14 @@ class Puzzle(object):
 
 #def Test_Random(lst, index, c=0):
 #  f = lambda lst, index, c: list[c][1] if lst[c][0] == index else f(lst, index, c + 1)
+
+
+if __name__ == '__main__':
+  import ind
+  inds = ind.get_population()
+  corner = [i for i in inds if i[1].count(0) == 2]
+  border = [i for i in inds if i[1].count(0) == 1]
+  inside = [i for i in inds if i[1].count(0) == 0]
+  puzzle = Puzzle(lambda: (0, (corner, border, inside), 0))
+  puzzle.draw()
+#  puzzle.save_picture()

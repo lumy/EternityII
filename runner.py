@@ -1,19 +1,18 @@
-import numpy
 from deap import base, tools
 from deap import creator
 from deap.tools import HallOfFame
 import matplotlib.pyplot as plt
 import config as CONFIG
+import eternity
 from puzzle import Puzzle
 import copy
-import statistics
 
 class Runner():
 
   def __init__(self, lines, pid,):
     self.toolbox = base.Toolbox()
     self.lc, self.lb, self.li = lines
-    self.create_index = 0
+    self.puzzle_id = 0
     self.pid = pid
 
     creator.create("FitnessMax", base.Fitness, weights=(-1.0,))
@@ -65,8 +64,8 @@ class Runner():
 
 
   def get_args_lines_index(self):
-    t = self.create_index
-    self.create_index += 1
+    t = self.puzzle_id
+    self.puzzle_id += 1
     return (t, (copy.copy(self.lc), copy.copy(self.lb), copy.copy(self.li)), self.pid)
 
 
@@ -89,6 +88,7 @@ class Runner():
     for i in range(1, kwargs.get("evals", CONFIG.NGEN)):
 
       for puzzle in pop:
+        puzzle.save_picture(gen=i)
         puzzle.select()
       self.eval(pop, eval=i, verbose=True)
 
@@ -107,6 +107,7 @@ class Runner():
 
       self.eval(pop, eval=i, verbose=True)
 
+
       record = self.stats.compile(pop)
       self.logbook.record(eval=i, mutate=True, population=pop, **record)
       self.famous.update(pop)
@@ -116,10 +117,11 @@ class Runner():
     self.logbook.header = "avg", "max"
     fit_max = self.logbook.select("max")
     fit_avg = self.logbook.select("min")
-    self.generate_graph(gen, fit_max, fit_avg)
+    #self.generate_graph(gen, fit_max, fit_avg)
     map(lambda x: x.writeLogbook(), pop)
     with open("gen/%s/logbook.txt" % self.pid, "w") as f:
       f.write(str(self.logbook))
+    #eternity.draw(pop[0].get_pieces())
     #logbook.chapters["content"].select("all")
 
 
