@@ -1,7 +1,7 @@
 NORTH = 0
-WEST = 1
+EAST = 1
 SOUTH = 2
-EAST = 3
+WEST = 3
 
 def special_case(ind, val, direction):
   if ind[direction] == 0:
