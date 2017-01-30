@@ -5,7 +5,6 @@ import os
 import pygame
 import config
 from ind import Ind
-from puzzle import Puzzle
 
 IPIECES=[]
 
@@ -63,8 +62,8 @@ def _show_game(l):
 def _prepare(linds):
   if len(IPIECES) == 0:
     _init_ipieces()
-  if isinstance(linds, Puzzle):
-    _prepare(linds.get_pieces())
+  if not isinstance(linds, list):
+    _prepare(linds.population)
     return
   lfinal = _sort_uid(linds)
   return lfinal

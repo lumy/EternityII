@@ -15,7 +15,7 @@ def _load_file(s):
   except Exception:
     return None
 
-def load_population(pid):
+def load_population():
 
   f = _load_file(config.population_file_saved)
   if f != None: # Todo Save a basic population and reload it in the Puzzle
@@ -26,7 +26,7 @@ def load_population(pid):
   corner = [i for i in inds if i[1].count(0) == 2]
   border = [i for i in inds if i[1].count(0) == 1]
   inside = [i for i in inds if i[1].count(0) == 0]
-  return Puzzle((corner, border, inside), pid)
+  return Puzzle((corner, border, inside))
 
 
 def save_population(puzzle):
@@ -47,11 +47,11 @@ def loop(puzzle):
       # How you can save a picture into your personal folder
       puzzle.save_picture(gen=i)
       # Example of call
-      removed_tils = puzzle.select()
+#      removed_tils = puzzle.select()
       # Example of call
-      puzzle.crossover(removed_tils)
+#      puzzle.crossover(removed_tils)
       # Example of call
-      puzzle.mutate(removed_tils)
+#      puzzle.mutate(removed_tils)
       # If you want log the different data
       puzzle.log_stats(i)
       # you may want to generate some graph
@@ -66,12 +66,11 @@ def loop(puzzle):
     save_population(puzzle)
 
 def main():
-  pid = os.getpid()
   try:
     os.mkdir("./gen/")
   except Exception as e:
     print e
-  puzzle = load_population(pid)
+  puzzle = load_population()
   loop(puzzle)
 
 

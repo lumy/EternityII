@@ -11,6 +11,7 @@ from deap import base
 from deap import creator
 from deap import tools
 import config
+import ind
 import eternity
 # Not use for now but for easier read i guess all eval code should go there.
 import eval
@@ -48,10 +49,8 @@ class Puzzle(object):
 
     self.toolbox = base.Toolbox()
     # Creation des deux valeurs
-    creator.create("FitnessInd", base.Fitness, weights=(0, 4))
-    # TODO: si on veut pouvoir facilement utiliser notre code sur d'autre taille il faut inscrire la
-    # TODO: taille dans le plateau pour ici faire un simple calcule pour remplacer 1024.
-    creator.create("FitnessGroup", base.Fitness, weights=(0, 1024))
+    creator.create("FitnessInd", base.Fitness, weights=(0,))
+    creator.create("FitnessGroup", base.Fitness, weights=(0,))
     # Individu creation
     creator.create("Individual", ind.Ind, fitness_ind=creator.FitnessInd, fitness_group=creator.FitnessGroup)
 
@@ -71,14 +70,16 @@ class Puzzle(object):
     We have to talk about it here and see what's we're looging and if we do us a math on it.
     :return:
     """
-    self.stats = tools.Statistics(key=lambda ind: ind.weight.value)
+    self.stats = tools.Statistics(key=lambda ind: ind.fitness_ind.value)
+    # Look for multistats if we wants stat on fitness_group
+    # self.stats = tools.Statistics(key=lambda ind: ind.fitness_group.value)
     self.stats.register("avg", statistics.mean)
     self.stats.register("std", numpy.std)
     self.stats.register("min", min)
     self.stats.register("max", max)
     self.stats.register("median", statistics.median)
     self.logbook = tools.Logbook()
-    self.logbook.header = "generation", "fitness", "min", "avg", "max"
+#    self.logbook.header = "generation", "fitness", "min", "avg", "max"
     self.record = None
 
   def evaluate(self):
@@ -88,7 +89,9 @@ class Puzzle(object):
     """
     # Dummy evaluation of type FitnessIndividual.
     # Can be used to get these.
-    # eval.eval_solution(self.population)
+    values, note = eval.eval_solution(self.population)
+    for ind, v in zip(self.population, values):
+      ind.fitness_ind.value = v
     return
 
   #####################
