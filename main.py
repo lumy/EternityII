@@ -1,18 +1,12 @@
 import os
 import ind
+from puzzle import Puzzle
 
+# WINDOWS TROUBLE ><
 os.environ['TCL_LIBRARY'] = "C:\\Python27\\tcl\\tcl8.5"
 os.environ['TK_LIBRARY'] = "C:\\Python27\\tcl\\tk8.5"
 
 import config
-from runner import Runner
-
-
-def create_subdir(s):
-  try:
-    os.mkdir(s)
-  except Exception as e:
-    print e
 
 def _load_file(s):
   try:
@@ -24,7 +18,7 @@ def _load_file(s):
 def load_population(pid):
 
   f = _load_file(config.population_file_saved)
-  if f != None: # Todo Save a basic population and reload it in the Runner
+  if f != None: # Todo Save a basic population and reload it in the Puzzle
     raise NotImplemented
 
   # Loading a basic Population with a runner
@@ -32,15 +26,53 @@ def load_population(pid):
   corner = [i for i in inds if i[1].count(0) == 2]
   border = [i for i in inds if i[1].count(0) == 1]
   inside = [i for i in inds if i[1].count(0) == 0]
-  return Runner((corner, border, inside), pid)
+  return Puzzle((corner, border, inside), pid)
 
+
+def save_population(puzzle):
+  # TODO: Save with pickles
+  pass
+
+
+def loop(puzzle):
+    """
+      We Assume that the population is new an just setup and need to be eval first
+    :param args:
+    :param kwargs:
+    :return:
+    """
+    for i in range(0, config.NGEN):
+      # Evaluate the entire population
+      puzzle.evaluate()
+      # How you can save a picture into your personal folder
+      puzzle.save_picture(gen=i)
+      # Example of call
+      removed_tils = puzzle.select()
+      # Example of call
+      puzzle.crossover(removed_tils)
+      # Example of call
+      puzzle.mutate(removed_tils)
+      # If you want log the different data
+      puzzle.log_stats(i)
+      # you may want to generate some graph
+      puzzle.generate_graph_values(config.NGEN)
+
+    # END LOOP
+    # You may want to save the log book
+    puzzle.write_logbook()
+    # you may want to generate some graph
+    puzzle.generate_graph_values(config.NGEN)
+    # TODO implement
+    save_population(puzzle)
 
 def main():
   pid = os.getpid()
-  create_subdir("gen/%s/" % pid)
-  create_subdir("gen/%s/puzzles" % pid)
-  runner = load_population(pid)
-  runner(verbose=True)
+  try:
+    os.mkdir("./gen/")
+  except Exception as e:
+    print e
+  puzzle = load_population(pid)
+  loop(puzzle)
 
 
 if __name__ == '__main__':
