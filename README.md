@@ -37,7 +37,10 @@ $ i.rotate() # Rotate the ind in clock way (to check)
 
 $ i.count(0) # Return the number of 0 in ind
 2
-$
+$ i[0]
+1
+$ i[3]
+17
 ```
 
 Then some usefull in Puzzle:
@@ -55,32 +58,3 @@ You can easily draw or save a Puzzle:
  $ eternity.save(puzzle, gen=1)
  ```
 
-And finally have a look at our runner __call__ method:
-```python
-  def __call__(self, *args, **kwargs):
-    pop = self.get_population(kwargs.get("verbose", False))
-
-    for i in range(0, kwargs.get("evals", CONFIG.NGEN)):
-
-      # We May be Preselecting some puzzle to save and "Reproduce"
-
-      for puzzle in pop:
-        puzzle.save_picture(gen=i)
-        puzzle.select()
-        puzzle.mutate(config.mutate_inpd)
-      self.crossover()
-      fitnesses = self.eval(pop, eval=i, verbose=True)
-
-      record = self.stats.compile(pop)
-      self.logbook.record(eval=i, fitnesses=fitnesses, population=pop, **record)
-      self.famous.update(pop)
-
-
-    gen = self.logbook.select("eval")
-    #self.logbook.header = "population"
-    fits = self.logbook.select("fitnesses")
-    self.generate_graph(gen, fits)
-    map(lambda x: x.writeLogbook(), pop)
-    with open("gen/%s/logbook.txt" % self.pid, "w") as f:
-      f.write(str(self.logbook))
-```
