@@ -1,4 +1,6 @@
 import os
+import pickle
+
 import ind
 from puzzle import Puzzle
 
@@ -10,8 +12,8 @@ import config
 
 def _load_file(s):
   try:
-    with open(s) as e:
-      return e.readlines()
+    with open(s, "rb") as e:
+      return pickle.load(e)
   except Exception:
     return None
 
@@ -19,6 +21,9 @@ def load_population():
 
   f = _load_file(config.population_file_saved)
   if f != None: # Todo Save a basic population and reload it in the Puzzle
+    print "Old Population Load First Check if ok remove the Raise and return f as e Puzzle"
+    print type(f)
+    print f
     raise NotImplemented
 
   # Loading a basic Population with a runner
@@ -30,9 +35,9 @@ def load_population():
 
 
 def save_population(puzzle):
-  # TODO: Save with pickles
-  pass
-
+  with open(config.population_file_saved, "wb") as f:
+    pickle.dump(puzzle, f)
+  print "Saved @%s" % config.population_file_saved
 
 def loop(puzzle):
     """
