@@ -52,14 +52,13 @@ def loop(puzzle):
       # How you can save a picture into your personal folder
       puzzle.save_picture(gen=i)
       # Example of call
-      #removed_tils = puzzle.select()
+      removed_tils = puzzle.select()
       # Example of call
-      #puzzle.crossover(removed_tils)
+      puzzle.crossover(removed_tils)
       # Example of call
-      #puzzle.mutate(removed_tils)
+      puzzle.mutate(removed_tils)
       # If you want log the different data
-      mutated = []
-      puzzle.log_stats(i, len(mutated))
+      puzzle.log_stats(i)
       # you may want to generate some graph
       puzzle.generate_graph_values(config.NGEN)
 
@@ -67,7 +66,7 @@ def loop(puzzle):
     # You may want to save the log book
     puzzle.write_logbook()
     # you may want to generate some graph
-    #puzzle.generate_graph_values(config.NGEN)
+    puzzle.generate_graph_values(config.NGEN)
     # TODO implement
     save_population(puzzle)
 

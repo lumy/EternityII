@@ -49,8 +49,8 @@ class Puzzle(object):
 
     self.toolbox = base.Toolbox()
     # Creation des deux valeurs
-    creator.create("FitnessInd", base.Fitness, weights=(1.0,))
-    creator.create("FitnessGroup", base.Fitness, weights=(1.0,))
+    creator.create("FitnessInd", base.Fitness, weights=(0,))
+    creator.create("FitnessGroup", base.Fitness, weights=(0,))
     # Individu creation
     creator.create("Individual", ind.Ind, fitness_ind=creator.FitnessInd, fitness_group=creator.FitnessGroup)
 
@@ -70,13 +70,13 @@ class Puzzle(object):
     We have to talk about it here and see what's we're looging and if we do us a math on it.
     :return:
     """
-    stats2 = tools.Statistics(key=lambda ind: ind.fitness_group.values)
-    stats1 = tools.Statistics(key=lambda ind: ind.fitness_ind.values)
+    stats1 = tools.Statistics(key=lambda ind: ind.fitness_ind.value)
+    stats2 = tools.Statistics(key=lambda ind: ind.fitness_group.value)
     self.stats = tools.MultiStatistics(fitness_ind=stats1, fitness_group=stats2)
-    # self.stats.register("avg", numpy.mean)
-    # self.stats.register("std", numpy.std)
+    self.stats.register("avg", numpy.mean)
+    self.stats.register("std", numpy.std)
     self.stats.register("min", min)
-    # self.stats.register("max", max)
+    self.stats.register("max", max)
     self.logbook = tools.Logbook()
     self.record = None
     # HallOfFame ?
@@ -92,7 +92,7 @@ class Puzzle(object):
     """
     # Compiling the stats we ask in self.init_stats()
     self.record = self.stats.compile(self.population)
-    ls = [(x.fitness_ind.values, x.fitness_group.values) for x in self.population]
+    ls = [(x.fitness_ind.value, x.fitness_group.value) for x in self.population]
     fitness_ind, fitness_group = zip(*ls)
     # Writting them in the logbook Instance
     self.logbook.record(generations=generation, ind=fitness_ind, group=fitness_group, mutated=n_mutation, mutation_percent=config.mutate_inpd, population=self.population, **self.record)
@@ -113,8 +113,7 @@ class Puzzle(object):
     # Can be used to get these.
     values, note = eval.eval_solution(self.population)
     for ind, v in zip(self.population, values):
-      ind.fitness_ind.value = v,
-      ind.fitness_group.value = v,
+      ind.fitness_ind.value = v
     return
 
   #####################
@@ -194,7 +193,6 @@ def create_subdir(s):
 
 
 if __name__ == '__main__':
-
   import ind
   inds = ind.get_population()
   corner = [i for i in inds if i[1].count(0) == 2]
