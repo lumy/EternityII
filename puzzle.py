@@ -95,7 +95,7 @@ class Puzzle(object):
     
   def mutate(self):
     # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
-    rand_rate = 50
+    rand_rate = 5
     rand = 0
     for ind in self.population:
       rand = random.randint(0, 100)
