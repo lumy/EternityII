@@ -82,6 +82,31 @@ class Puzzle(object):
 #    self.logbook.header = "generation", "fitness", "min", "avg", "max"
     self.record = None
 
+  def mutate_rotation(self, ind):
+    for x in range(random.randint(1, 3)):
+      ind.rotate()   
+    
+  def mutate_position(self, ind):
+    current = self.population.index(ind)
+    other = random.randint(0, 255)
+    while (current == other):
+      other = random.randint(0, 255)
+    self.population[current], self.population[other] = self.population[other], self.population[current]
+    
+  def mutate(self):
+    # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
+    rand_rate = 50
+    rand = 0
+    for ind in self.population:
+      rand = random.randint(0, 100)
+      if (rand >= rand_rate):
+        self.mutate_rotation(ind)
+        print "MUTATION ROTATE"
+      rand = random.randint(0, 100)
+      if (rand >= rand_rate):
+        print "MUTATION POSITION"
+        self.mutate_position(ind)
+      
   def evaluate(self):
     """
 
