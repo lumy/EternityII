@@ -45,6 +45,7 @@ class Puzzle(object):
     self.personal_path = "gen/%s_%s/" % (user, seed)
     create_subdir(self.personal_path)
     self.index_line = 0
+    self.completion = 0
     print "Personal Path used for this Puzzle: %s" % self.personal_path
 
     self.toolbox = base.Toolbox()
@@ -64,6 +65,8 @@ class Puzzle(object):
     self.fixing_outside()
     # Init the stats we want to log
     self.stats = stats.Stats(self.personal_path)
+    self.evaluate()
+    self.log_stats(-1, 0)
 
   # Stats Function
   def log_stats(self, generation, n_mutated):
@@ -73,7 +76,8 @@ class Puzzle(object):
     :param n_mutated:
     :return:
     """
-    self.stats.log_stats(generation, self.population, n_mutated)
+    print "Looging for Generation ", generation
+    self.stats.log_stats(generation, copy.deepcopy(self.population), n_mutated, self.completion)
 
   def write_stats(self):
     """
@@ -151,28 +155,11 @@ class Puzzle(object):
   def __repr__(self):
     return repr(self.uid) + repr(self.population)
 
-  def generate_graph_values(self, ngen=0):
-    """
-      Generate a graph and save it.
-    :param ngen:
-    :return:
-    """
-    nrow = [0, None, -1.0, 1.0]
-    #[-100, -75, -50, -25, 0, 25, 50, 75, 100]
+  def generate_graph_per_generations(self, saved=True, show=False):
+    self.stats.generate_graph_per_generations(saved=saved, show=show)
 
-    # Temporary fix until we now exactly what we want to log
-    fitnesses = range(0, 256)
-    y = 0
-    for x in fitnesses:
-      plt.scatter(y, x, marker='.', c='c')
-      y += 1
-    plt.axis(nrow)
-    plt.ylabel("weight")
-    plt.xlabel("population")
-    plt.gcf().set_size_inches(15, 5)
-    plt.savefig("%s/g_%s.png" % (self.personal_path, ngen), bbox_inches='tight', dpi=100)
-    plt.clf()
-    plt.close()
+  def generate_stats_generations(self, ftype="avg", saved=True, show=False):
+    self.stats.generate_stats_generations(ftype=ftype, saved=saved, show=show)
 
   def _get_line_(self, arr):
     i = self.index_line
@@ -182,10 +169,11 @@ class Puzzle(object):
   def save_picture(self, gen=0, score=0):
     eternity.save(self.population, "%s/gen_%s_score_%s" % (self.personal_path, gen, score))
 
-  def draw(self):
-    eternity.draw(self.population)
+  def draw_generation(self, n):
+    self.stats.draw_generation(n)
 
-
+  def draw_all_generations(self):
+    self.stats.draw_all_eternity()
 
 def create_subdir(s):
   try:
