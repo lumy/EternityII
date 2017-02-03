@@ -1,6 +1,8 @@
 import os
 import pickle
 
+import dill as dill
+
 import ind
 from puzzle import Puzzle
 
@@ -12,8 +14,8 @@ import config
 
 def _load_file(s):
   try:
-    with open(s, "rb") as e:
-      return pickle.load(e)
+    with open(s, "r") as e:
+      return dill.load(e)
   except Exception:
     return None
 
@@ -35,8 +37,8 @@ def load_population():
 
 
 def save_population(puzzle):
-  with open(config.population_file_saved, "wb") as f:
-    pickle.dump(puzzle, f)
+  with open(config.population_file_saved, "w") as f:
+    dill.dump(puzzle, f)
   print "Saved @%s" % config.population_file_saved
 
 def loop(puzzle):
