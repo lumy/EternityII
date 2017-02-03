@@ -111,19 +111,21 @@ class Puzzle(object):
       return 2
 
   def mutate(self):
+    mutation_counter = 0
     # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
     rand_rate = config.mutate_inpd
     rand = 0.00
     for ind in self.population:
       rand = random.uniform(0.000, 100.000)
       if (rand <= rand_rate):
+        mutation_counter += 1
         operation = self.choose_mutation(ind)
         if (random.uniform(0.000, 100.000) <= rand_rate):
           if (operation == 1):
             self.mutate_position(ind)
           else:
             self.mutate_rotation(ind)
-
+    return mutation_counter
 
   def evaluate(self):
     """
