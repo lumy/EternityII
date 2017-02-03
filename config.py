@@ -7,4 +7,4 @@ NGEN = 200
 NPOPULATION = 10
 
 
-mutate_inpd=0.4
+mutate_inpd=0.4selection_ind_value=1

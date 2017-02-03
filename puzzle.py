@@ -192,6 +192,17 @@ class Puzzle(object):
     with open("%s/logbook.txt" % self.personal_path, "w") as f:
       f.write(str(self.logbook))
 
+  def select(self):
+    removed_tils = []
+    for i, ind in enumerate(self.population):
+      if ind.fitness_ind.value < config.selection_ind_value:
+        # print "id : %s value : %s" % (i+1, ind.fitness_ind.value)
+        self.population[i] = None
+        removed_tils.append(ind)
+    # for i in self.population:
+    #   print i
+    print len(removed_tils)
+    return removed_tils
 
 def create_subdir(s):
   try:

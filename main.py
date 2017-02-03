@@ -49,9 +49,9 @@ def loop(puzzle):
       # Example of call
       removed_tils = puzzle.select()
       # Example of call
-      puzzle.crossover(removed_tils)
+    #   puzzle.crossover(removed_tils)
       # Example of call
-      puzzle.mutate(removed_tils)
+    #   puzzle.mutate(removed_tils)
       # If you want log the different data
       puzzle.log_stats(i)
       # you may want to generate some graph
