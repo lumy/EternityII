@@ -1,9 +1,9 @@
 
 IMG="./Eternity/"
 
-population_file_saved="try01.pickle"
+population_file_saved="try01.dill"
 population_file_base="e2pieces.txt"
-NGEN = 200
+NGEN = 2
 NPOPULATION = 10
 
 
