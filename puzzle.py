@@ -47,6 +47,8 @@ class Puzzle(object):
     self.index_line = 0
     print "Personal Path used for this Puzzle: %s" % self.personal_path
 
+    self.completion = 0.0 # current puzzle completion in percentage
+
     self.toolbox = base.Toolbox()
     # Creation des deux valeurs
     creator.create("FitnessInd", base.Fitness, weights=(0,))
@@ -109,11 +111,25 @@ class Puzzle(object):
 
     :return:
     """
-    # Dummy evaluation of type FitnessIndividual.
-    # Can be used to get these.
-    values, note = eval.eval_solution(self.population)
-    for ind, v in zip(self.population, values):
-      ind.fitness_ind.value = v
+    # individuals, individual's clusters, and puzzle completion evaluations
+    individuals_s, individuals_clusters_s, puzzle_completion = eval.eval_solution(self.population)
+
+    # print "individuals evaluation:"
+    # for index in range(0, 16):
+    #   print individuals_s[index * 16: (index * 16) + 16]
+    # print
+
+    # print "individuals clusters evaluation:"
+    # for index in range(0, 16):
+    #   print individuals_clusters_s[index * 16: (index * 16) + 16]
+    # print
+
+    # print "puzzle completion:", puzzle_completion, "%\n"
+
+    self.completion = puzzle_completion
+    for individual, individual_s, cluster_s in zip(self.population, individuals_s, individuals_clusters_s):
+      individual.fitness_ind.values = (individual_s,)
+      individual.fitness_group.values = (individuals_clusters_s,)
     return
 
   #####################
