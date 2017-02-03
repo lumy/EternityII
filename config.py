@@ -8,3 +8,4 @@ NPOPULATION = 10
 
 
 mutate_inpd=0.4
+elitism_percentage=10
