@@ -7,6 +7,12 @@ import eternity
 import graphs
 
 
+
+def get_group_val(ind):
+  return ind.fitness_group.values
+def get_ind_val(ind):
+  return ind.fitness_ind.values
+
 class Stats(object):
 
   def __init__(self, personal_path):
@@ -15,8 +21,8 @@ class Stats(object):
     :return:
     """
     self.personal_path = personal_path
-    stats1 = tools.Statistics(key=lambda ind: ind.fitness_ind.values)
-    stats2 = tools.Statistics(key=lambda ind: ind.fitness_group.values)
+    stats1 = tools.Statistics(key=get_ind_val)
+    stats2 = tools.Statistics(key=get_group_val)
     self.stats = tools.MultiStatistics(individual_fitness=stats1, group_fitness=stats2)
     self.stats.register("avg", numpy.mean)
     self.stats.register("min", min)
