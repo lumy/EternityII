@@ -1,20 +1,19 @@
 import matplotlib.pyplot as plt
 
+
 def _generate_graph_weight_population(xlabel, value1, value2, saved, show, fullpath):
   """
      Generate a graph and save it.
    :param ngen:
    :return:
    """
+
   fig, ax1 = plt.subplots()
-  print value1[0]
-  print value1[1]
   line1 = ax1.plot(value1[0], value1[1], "b.", label=value1[2])
   ax1.set_xlabel(xlabel)
   ax1.set_ylabel(value1[2], color="b")
   for tl in ax1.get_yticklabels():
     tl.set_color("b")
-
   ax2 = ax1.twinx()
   line2 = ax2.plot(value2[0], value2[1], "r.", label=value2[2])
   ax2.set_ylabel(value2[2], color="r")
@@ -22,6 +21,7 @@ def _generate_graph_weight_population(xlabel, value1, value2, saved, show, fullp
     tl.set_color("r")
   lns = line1 + line2
   labs = [l.get_label() for l in lns]
+
   ax1.legend(lns, labs, loc="center right")
   plt.gcf().set_size_inches(18, 5)
   if show:
