@@ -76,7 +76,6 @@ class Puzzle(object):
     :param n_mutated:
     :return:
     """
-    print "Looging for Generation ", generation
     self.stats.log_stats(generation, copy.deepcopy(self.population), n_mutated, self.completion)
 
   def write_stats(self):
