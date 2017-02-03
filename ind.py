@@ -62,6 +62,11 @@ class Ind(object):
     if self.rotation >= 4:
       self.rotation = 0
 
+  def rotates(self, nb):
+    while nb > 0:
+      nb -= 1
+      self.rotate()
+
   def __repr__(self):
     return "n:%s e:%s s:%s w:%s" % (self.content[0], self.content[1], self.content[2], self.content[3])
 

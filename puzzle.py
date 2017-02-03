@@ -91,8 +91,8 @@ class Puzzle(object):
 
   def mutate_rotation(self, ind):
     for x in range(random.randint(1, 3)):
-      ind.rotate()   
-    
+      ind.rotate()
+
   def mutate_position(self, ind):
     current = self.population.index(ind)
     other = random.randint(0, 255)
@@ -109,7 +109,7 @@ class Puzzle(object):
 #      print "MUTATION ROTATION"
       self.mutate_position(ind)
       return 2
-  
+
   def mutate(self):
     # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
     rand_rate = config.mutate_inpd
@@ -123,8 +123,8 @@ class Puzzle(object):
             self.mutate_position(ind)
           else:
             self.mutate_rotation(ind)
-          
-      
+
+
   def evaluate(self):
     """
 
@@ -152,19 +152,17 @@ class Puzzle(object):
 
   def select(self):
     removed_tils = []
-    selection_ind_value = config.selection_ind_value_min
+    selection_ind_value = min(self.population, key=lambda k:k.fitness_ind.values).fitness_group.values
     # Get nb tils to remove
     nb_to_remove = (100.0 - config.elitism_percentage) * 256.0 / 100.0
-
     # Select algorithm
     while nb_to_remove > 0:
       for i, ind in enumerate(self.population):
-        if nb_to_remove > 0 and i > 0 and ind is not None and ind.fitness_ind.value == selection_ind_value:
+        if nb_to_remove > 0 and i > 0 and ind is not None and ind.fitness_group.values == selection_ind_value:
           self.population[i] = None
           removed_tils.append(ind)
           nb_to_remove -= 1
-      selection_ind_value += config.selection_ind_value_step
-
+      selection_ind_value = (selection_ind_value[0] + config.selection_ind_value_step,)
     return removed_tils
 
   def crossover(self, removed_tils):
@@ -173,18 +171,22 @@ class Puzzle(object):
     list_border = [ind for ind in removed_tils if ind.count(0) == 1]
     list_center = [ind for ind in removed_tils if ind.count(0) == 0]
     # Set corners and borders
+    random.shuffle(list_center)
+    random.shuffle(list_border)
+    random.shuffle(list_corner)
+    # Random rotation on center pils
+    for ind in list_center:
+      ind.rotates(random.randint(0, 4))
     for i, ind in enumerate(self.population):
       if ind is None:
         if i in CORNER_POS:
           self.population[i] = list_corner.pop()
-        if i in BORDER_POS:
+        elif i in BORDER_POS:
           self.population[i] = list_border.pop()
-    # Set center
-    for i, ind in enumerate(self.population):
-      if ind is None:
-        self.population[i] = list_center.pop(random.randrange(len(list_center)))
+        else:
+          self.population[i] = list_center.pop(random.randrange(len(list_center)))
     # Applying rotation until it's the right side
-    self.fixing_outside();
+    self.fixing_outside()
 
   #####################
   #  Tools function   #
