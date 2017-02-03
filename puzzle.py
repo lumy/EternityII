@@ -46,7 +46,6 @@ class Puzzle(object):
     self.personal_path = "gen/%s_%s/" % (user, seed)
     create_subdir(self.personal_path)
     self.index_line = 0
-    self.completion = 0
     print "Personal Path used for this Puzzle: %s" % self.personal_path
 
     self.toolbox = base.Toolbox()
