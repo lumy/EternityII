@@ -7,6 +7,7 @@ import os
 from deap import base
 from deap import creator
 from deap import tools
+from datetime import datetime
 
 import graphs
 import config
@@ -41,9 +42,9 @@ class Puzzle(object):
   """
   # Constructor
   def __init__(self, lines):
-    seed = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+    current_time = datetime.now().strftime("%d-%m-%Y_%Hh.%Mm.%Ss")
     user = getpass.getuser()
-    self.personal_path = "gen/%s_%s/" % (user, seed)
+    self.personal_path = "gen/%s_%s/" % (user, current_time)
     create_subdir(self.personal_path)
     self.index_line = 0
     print "Personal Path used for this Puzzle: %s" % self.personal_path
