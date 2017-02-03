@@ -105,15 +105,13 @@ class Puzzle(object):
   
   def mutate(self):
     # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
-    rand_rate = 0.5
+    rand_rate = config.mutate_inpd
     rand = 0.00
     for ind in self.population:
       rand = random.uniform(0.000, 100.000)
       if (rand <= rand_rate):
-        print "begin: " + str(rand)
         operation = self.choose_mutation(ind)
         if (random.uniform(0.000, 100.000) <= rand_rate):
-          print "lucky"
           if (operation == 1):
             self.mutate_position(ind)
           else:
