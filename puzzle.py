@@ -4,7 +4,6 @@ import copy
 import string
 import numpy
 import os
-import statistics
 from deap import base
 from deap import creator
 from deap import tools
@@ -15,8 +14,10 @@ import ind
 import eternity
 # Not use for now but for easier read i guess all eval code should go there.
 import eval
+import stats
 
 # Coins Hautgauche, Hautdroit, basGauche, basDroit
+
 CORNER_POS = [0, 15, 240, 255]
 # Mask des coins Hautgauche, Hautdroit, basGauche, basDroit
 MASK_CORNERS = [[0, None, None, 0], [0, 0, None, None], [None, None, 0, 0], [None, 0, 0, None]]
@@ -47,10 +48,12 @@ class Puzzle(object):
     self.index_line = 0
     print "Personal Path used for this Puzzle: %s" % self.personal_path
 
+    self.completion = 0.0 # current puzzle completion in percentage
+
     self.toolbox = base.Toolbox()
     # Creation des deux valeurs
-    creator.create("FitnessInd", base.Fitness, weights=(0,))
-    creator.create("FitnessGroup", base.Fitness, weights=(0,))
+    creator.create("FitnessInd", base.Fitness, weights=(1,))
+    creator.create("FitnessGroup", base.Fitness, weights=(1,))
     # Individu creation
     creator.create("Individual", ind.Ind, fitness_ind=creator.FitnessInd, fitness_group=creator.FitnessGroup)
 
@@ -63,58 +66,89 @@ class Puzzle(object):
     # Applying rotation until it's the right side
     self.fixing_outside()
     # Init the stats we want to log
-    self.init_stats()
+    self.stats = stats.Stats(self.personal_path)
+    self.evaluate()
+    self.log_stats(-1, 0)
 
-  def init_stats(self):
+  # Stats Function
+  def log_stats(self, generation, n_mutated):
     """
-    We have to talk about it here and see what's we're looging and if we do us a math on it.
+    Do that at each iteration.
+    :param generation:
+    :param n_mutated:
     :return:
     """
-    stats1 = tools.Statistics(key=lambda ind: ind.fitness_ind.value)
-    stats2 = tools.Statistics(key=lambda ind: ind.fitness_group.value)
-    self.stats = tools.MultiStatistics(fitness_ind=stats1, fitness_group=stats2)
-    self.stats.register("avg", numpy.mean)
-    self.stats.register("std", numpy.std)
-    self.stats.register("min", min)
-    self.stats.register("max", max)
-    self.logbook = tools.Logbook()
-    self.record = None
-    # HallOfFame ?
-    # self.famous =
+    self.stats.log_stats(generation, copy.deepcopy(self.population), n_mutated, self.completion)
 
-
-  def log_stats(self, generation, n_mutation):
+  def write_stats(self):
     """
-      Call every iteration, log the current population and all the fitnesses
-
-    :param generation: Current number of Iteration
+    You can do that once you finished the main loop
     :return:
     """
-    # Compiling the stats we ask in self.init_stats()
-    self.record = self.stats.compile(self.population)
-    ls = [(x.fitness_ind.value, x.fitness_group.value) for x in self.population]
-    fitness_ind, fitness_group = zip(*ls)
-    # Writting them in the logbook Instance
-    self.logbook.record(generations=generation, ind=fitness_ind, group=fitness_group, mutated=n_mutation, mutation_percent=config.mutate_inpd, population=self.population, **self.record)
-    # I case we need to keep famous big scores.
-    # self.famous.update(self.pop)
+    self.stats.write_logbook()
+    self.stats.write_logbook(bin=True)
+  # End Stats Function
 
-  def write_logbook(self):
-    self.logbook.header = "generation", "mutation_percent", "mutated", "ind", "group", "population"
-    with open("%s/logbook.txt" % self.personal_path, "w") as f:
-      f.write(str(self.logbook))
+  def mutate_rotation(self, ind):
+    for x in range(random.randint(1, 3)):
+      ind.rotate()   
+    
+  def mutate_position(self, ind):
+    current = self.population.index(ind)
+    other = random.randint(0, 255)
+    while (current == other):
+      other = random.randint(0, 255)
+    self.population[current], self.population[other] = self.population[other], self.population[current]
 
+  def choose_mutation(self, ind):
+    if (random.randint(0, 100) <= 50):
+#      print "MUTATION POSITION"
+      self.mutate_position(ind)
+      return 1
+    else:
+#      print "MUTATION ROTATION"
+      self.mutate_position(ind)
+      return 2
+  
+  def mutate(self):
+    # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
+    rand_rate = config.mutate_inpd
+    rand = 0.00
+    for ind in self.population:
+      rand = random.uniform(0.000, 100.000)
+      if (rand <= rand_rate):
+        operation = self.choose_mutation(ind)
+        if (random.uniform(0.000, 100.000) <= rand_rate):
+          if (operation == 1):
+            self.mutate_position(ind)
+          else:
+            self.mutate_rotation(ind)
+          
+      
   def evaluate(self):
     """
 
     :return:
     """
-    # Dummy evaluation of type FitnessIndividual.
-    # Can be used to get these.
-    values, note = eval.eval_solution(self.population)
-    for ind, v in zip(self.population, values):
-      ind.fitness_ind.value = v
-    return
+    # individuals, individual's clusters, and puzzle completion evaluations
+    individuals_s, individuals_clusters_s, puzzle_completion = eval.eval_solution(self.population)
+
+    # print "individuals evaluation:"
+    # for index in range(0, 16):
+    #   print individuals_s[index * 16: (index * 16) + 16]
+    # print
+
+    # print "individuals clusters evaluation:"
+    # for index in range(0, 16):
+    #   print individuals_clusters_s[index * 16: (index * 16) + 16]
+    # print
+
+    # print "puzzle completion:", puzzle_completion, "%\n"
+
+    self.completion = puzzle_completion
+    for individual, individual_s, cluster_s in zip(self.population, individuals_s, individuals_clusters_s):
+      individual.fitness_ind.values = individual_s,
+      individual.fitness_group.values = cluster_s,
 
   def select(self):
     removed_tils = []
@@ -200,13 +234,17 @@ class Puzzle(object):
 
 
   def __len__(self):
-    return len(self.content)
+    return len(self.population)
 
   def __repr__(self):
-    return repr(self.uid) + repr(self.population)
+    return repr(self.personal_path)
 
-  def generate_graph_values(self, ngen=0):
-   graphs.generate_graph_weight_population([x.fitness_ind.value for x in self.population])
+  def generate_graph_per_generations(self, saved=True, show=False):
+    self.stats.generate_graph_per_generations(saved=saved, show=show)
+
+  def generate_stats_generations(self, ftype="avg", saved=True, show=False):
+    self.stats.generate_stats_generations(ftype=ftype, saved=saved, show=show)
+
 
   def _get_line_(self, arr):
     i = self.index_line
@@ -216,8 +254,11 @@ class Puzzle(object):
   def save_picture(self, gen=0, score=0):
     eternity.save(self.population, "%s/gen_%s_score_%s" % (self.personal_path, gen, score))
 
-  def draw(self):
-    eternity.draw(self.population)
+  def draw_generation(self, n):
+    self.stats.draw_generation(n)
+
+  def draw_all_generations(self):
+    self.stats.draw_all_eternity()
 
 def create_subdir(s):
   try:

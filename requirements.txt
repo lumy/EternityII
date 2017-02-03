@@ -1,5 +1,5 @@
 numpy # Not sure it's still required but we might want use it to go faster
-statistics # check function statistics  see if really needed
 deap
 matplotlib
+dill
 pygame # Drawing the scene without java

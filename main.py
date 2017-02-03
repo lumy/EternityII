@@ -1,6 +1,8 @@
 import os
 import pickle
 
+import dill as dill
+
 import ind
 from puzzle import Puzzle
 
@@ -12,8 +14,8 @@ import config
 
 def _load_file(s):
   try:
-    with open(s, "rb") as e:
-      return pickle.load(e)
+    with open(s, "r") as e:
+      return dill.load(e)
   except Exception:
     return None
 
@@ -35,8 +37,8 @@ def load_population():
 
 
 def save_population(puzzle):
-  with open(config.population_file_saved, "wb") as f:
-    pickle.dump(puzzle, f)
+  with open(config.population_file_saved, "w") as f:
+    dill.dump(puzzle, f)
   print "Saved @%s" % config.population_file_saved
 
 def loop(puzzle):
@@ -52,21 +54,22 @@ def loop(puzzle):
       # How you can save a picture into your personal folder
       puzzle.save_picture(gen=i)
       # Example of call
-      removed_tils = puzzle.select()
+#      removed_tils = puzzle.select()
       # Example of call
-    #   puzzle.crossover(removed_tils)
+#      puzzle.crossover(removed_tils)
       # Example of call
-    #   puzzle.mutate(removed_tils)
+      puzzle.mutate()
       # If you want log the different data
-      puzzle.log_stats(i)
+      puzzle.log_stats(i, 0)
       # you may want to generate some graph
-      puzzle.generate_graph_values(config.NGEN)
 
     # END LOOP
     # You may want to save the log book
-    puzzle.write_logbook()
+    puzzle.write_stats()
+    puzzle.draw_all_generations()
     # you may want to generate some graph
-    puzzle.generate_graph_values(config.NGEN)
+    puzzle.generate_stats_generations(ftype="avg")
+    puzzle.generate_graph_per_generations()
     # TODO implement
     save_population(puzzle)
 
