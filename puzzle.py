@@ -96,16 +96,16 @@ class Puzzle(object):
   def mutate(self):
     # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
     rand_rate = 5
-    rand = 0
+    rand = 0.00
     for ind in self.population:
-      rand = random.randint(0, 100)
-      if (rand >= rand_rate):
-        self.mutate_rotation(ind)
-        print "MUTATION ROTATE"
-      rand = random.randint(0, 100)
-      if (rand >= rand_rate):
-        print "MUTATION POSITION"
-        self.mutate_position(ind)
+      rand = random.uniform(0.000, 100.000)
+      if (rand <= rand_rate):
+        if (random.randint(0, 100) <= 50):
+          self.mutate_rotation(ind)
+          print "MUTATION ROTATE"
+        if (random.randint(0, 100) <= 50):
+          print "MUTATION POSITION"
+          self.mutate_position(ind)
       
   def evaluate(self):
     """
