@@ -152,7 +152,7 @@ class Puzzle(object):
 
   def select(self):
     removed_tils = []
-    selection_ind_value = min(self.population, key=lambda k:k.fitness_ind.values).fitness_group.values
+    selection_ind_value = min(self.population, key=lambda k:k.fitness_group.values).fitness_group.values
     # Get nb tils to remove
     nb_to_remove = (100.0 - config.elitism_percentage) * 256.0 / 100.0
     # Select algorithm
