@@ -56,17 +56,18 @@ def loop(puzzle):
       # Example of call
       puzzle.crossover(removed_tils)
       # Example of call
-      puzzle.mutate(removed_tils)
+      puzzle.mutate()
       # If you want log the different data
-      puzzle.log_stats(i)
+      puzzle.log_stats(i, 0)
       # you may want to generate some graph
-      puzzle.generate_graph_values(config.NGEN)
 
     # END LOOP
     # You may want to save the log book
-    puzzle.write_logbook()
+    puzzle.write_stats()
+    puzzle.draw_all_generations()
     # you may want to generate some graph
-    puzzle.generate_graph_values(config.NGEN)
+    puzzle.generate_stats_generations(ftype="avg")
+    puzzle.generate_graph_per_generations()
     # TODO implement
     save_population(puzzle)
 
