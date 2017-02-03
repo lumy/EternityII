@@ -198,10 +198,10 @@ class Puzzle(object):
 
 
   def __len__(self):
-    return len(self.content)
+    return len(self.population)
 
   def __repr__(self):
-    return repr(self.uid) + repr(self.population)
+    return repr(self.personal_path)
 
   def generate_graph_per_generations(self, saved=True, show=False):
     self.stats.generate_graph_per_generations(saved=saved, show=show)
