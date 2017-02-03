@@ -8,6 +8,4 @@ NPOPULATION = 10
 
 
 mutate_inpd=0.4
-selection_ind_value_min=-1.0
-selection_ind_value_step=0.5
 elitism_percentage=10
