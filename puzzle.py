@@ -116,6 +116,42 @@ class Puzzle(object):
       ind.fitness_ind.value = v
     return
 
+  def select(self):
+    removed_tils = []
+    selection_ind_value = config.selection_ind_value_min
+    # Get nb tils to remove
+    nb_to_remove = (100.0 - config.elitism_percentage) * 256.0 / 100.0
+
+    # Select algorithm
+    while nb_to_remove > 0:
+      for i, ind in enumerate(self.population):
+        if nb_to_remove > 0 and i > 0 and ind is not None and ind.fitness_ind.value == selection_ind_value:
+          self.population[i] = None
+          removed_tils.append(ind)
+          nb_to_remove -= 1
+      selection_ind_value += config.selection_ind_value_step
+
+    return removed_tils
+
+  def crossover(self, removed_tils):
+    # Get corners, borders and centers tils in removed_tils
+    list_corner = [ind for ind in removed_tils if ind.count(0) == 2]
+    list_border = [ind for ind in removed_tils if ind.count(0) == 1]
+    list_center = [ind for ind in removed_tils if ind.count(0) == 0]
+    # Set corners and borders
+    for i, ind in enumerate(self.population):
+      if ind is None:
+        if i in CORNER_POS:
+          self.population[i] = list_corner.pop()
+        if i in BORDER_POS:
+          self.population[i] = list_border.pop()
+    # Set center
+    for i, ind in enumerate(self.population):
+      if ind is None:
+        self.population[i] = list_center.pop(random.randrange(len(list_center)))
+    # Applying rotation until it's the right side
+    self.fixing_outside();
+
   #####################
   #  Tools function   #
   #####################
@@ -182,58 +218,6 @@ class Puzzle(object):
 
   def draw(self):
     eternity.draw(self.population)
-
-
-  def select(self):
-    removed_tils = []
-    selection_ind_value = config.selection_ind_value_min
-    nb_to_remove = (100.0 - config.elitism_percentage) * 256.0 / 100.0
-
-    # Count values
-    # cpt = 0
-    # for i in self.population:
-    #   if i.fitness_ind.value == 1:
-    #     cpt += 1
-    # print "1 nb\t= %d" % cpt
-    # cpt = 0
-    # for i in self.population:
-    #   if i.fitness_ind.value == 0.5:
-    #     cpt += 1
-    # print "0.5 nb\t= %d" % cpt
-    # cpt = 0
-    # for i in self.population:
-    #   if i.fitness_ind.value == 0:
-    #     cpt += 1
-    # print "0 nb\t= %d" % cpt
-    # cpt = 0
-    # for i in self.population:
-    #   if i.fitness_ind.value == -0.5:
-    #     cpt += 1
-    # print "-0.5 nb\t= %d" % cpt
-    # cpt = 0
-    # for i in self.population:
-    #   if i.fitness_ind.value == -1:
-    #     cpt += 1
-    # print "-1 nb\t= %d" % cpt
-
-    # Select algorithm
-    while nb_to_remove > 0:
-      for i, ind in enumerate(self.population):
-        if nb_to_remove > 0 and i > 0 and ind is not None and ind.fitness_ind.value == selection_ind_value:
-          self.population[i] = None
-          removed_tils.append(ind)
-          nb_to_remove -= 1
-      selection_ind_value += config.selection_ind_value_step
-
-    # Print population after select
-    # for i in self.population:
-    #   if i is not None:
-    #     print i.fitness_ind.value
-    #   else:
-    #     print i
-    # print "len removed tils : %d" % len(removed_tils)
-
-    return removed_tils
 
 def create_subdir(s):
   try:
