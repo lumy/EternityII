@@ -186,14 +186,53 @@ class Puzzle(object):
 
   def select(self):
     removed_tils = []
-    for i, ind in enumerate(self.population):
-      if ind.fitness_ind.value < config.selection_ind_value:
-        # print "id : %s value : %s" % (i+1, ind.fitness_ind.value)
-        self.population[i] = None
-        removed_tils.append(ind)
+    selection_ind_value = config.selection_ind_value_min
+    nb_to_remove = (100.0 - config.elitism_percentage) * 256.0 / 100.0
+
+    # Count values
+    # cpt = 0
     # for i in self.population:
-    #   print i
-    print len(removed_tils)
+    #   if i.fitness_ind.value == 1:
+    #     cpt += 1
+    # print "1 nb\t= %d" % cpt
+    # cpt = 0
+    # for i in self.population:
+    #   if i.fitness_ind.value == 0.5:
+    #     cpt += 1
+    # print "0.5 nb\t= %d" % cpt
+    # cpt = 0
+    # for i in self.population:
+    #   if i.fitness_ind.value == 0:
+    #     cpt += 1
+    # print "0 nb\t= %d" % cpt
+    # cpt = 0
+    # for i in self.population:
+    #   if i.fitness_ind.value == -0.5:
+    #     cpt += 1
+    # print "-0.5 nb\t= %d" % cpt
+    # cpt = 0
+    # for i in self.population:
+    #   if i.fitness_ind.value == -1:
+    #     cpt += 1
+    # print "-1 nb\t= %d" % cpt
+
+    # Select algorithm
+    while nb_to_remove > 0:
+      for i, ind in enumerate(self.population):
+        if nb_to_remove > 0 and i > 0 and ind is not None and ind.fitness_ind.value == selection_ind_value:
+          self.population[i] = None
+          removed_tils.append(ind)
+          nb_to_remove -= 1
+      selection_ind_value += config.selection_ind_value_step
+
+    # Print population after select
+    # for i in self.population:
+    #   if i is not None:
+    #     print i.fitness_ind.value
+    #   else:
+    #     print i
+    # print "len removed tils : %d" % len(removed_tils)
+
     return removed_tils
 
 def create_subdir(s):
