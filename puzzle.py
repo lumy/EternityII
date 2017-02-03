@@ -92,20 +92,33 @@ class Puzzle(object):
     while (current == other):
       other = random.randint(0, 255)
     self.population[current], self.population[other] = self.population[other], self.population[current]
-    
+
+  def choose_mutation(self, ind):
+    if (random.randint(0, 100) <= 50):
+      print "MUTATION POSITION"
+      self.mutate_position(ind)
+      return 1
+    else:
+      print "MUTATION ROTATION"
+      self.mutate_position(ind)
+      return 2
+  
   def mutate(self):
     # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
-    rand_rate = 5
+    rand_rate = 0.5
     rand = 0.00
     for ind in self.population:
       rand = random.uniform(0.000, 100.000)
       if (rand <= rand_rate):
-        if (random.randint(0, 100) <= 50):
-          self.mutate_rotation(ind)
-          print "MUTATION ROTATE"
-        if (random.randint(0, 100) <= 50):
-          print "MUTATION POSITION"
-          self.mutate_position(ind)
+        print "begin: " + str(rand)
+        operation = self.choose_mutation(ind)
+        if (random.uniform(0.000, 100.000) <= rand_rate):
+          print "lucky"
+          if (operation == 1):
+            self.mutate_position(ind)
+          else:
+            self.mutate_rotation(ind)
+          
       
   def evaluate(self):
     """
