@@ -111,8 +111,8 @@ class Puzzle(object):
 
     self.completion = puzzle_completion
     for individual, individual_s, cluster_s in zip(self.population, individuals_s, individuals_clusters_s):
-      individual.fitness_ind.values = (individual_s,)
-      individual.fitness_group.values = (individuals_clusters_s,)
+      individual.fitness_ind.values = individual_s,
+      individual.fitness_group.values = cluster_s,
 
   #####################
   #  Tools function   #
