@@ -174,7 +174,8 @@ def eval_solution(population):
   individuals_cluster_score = virgin_individuals_cluster_score
   [eval_individual_cluster(population, index, individuals_score, individuals_cluster_score) for index in range(0, 256)]
   # Fitness = (number of good position * 100.0) / 256 (total element)
-  note = sum(individuals_score) * 100 / 256 # Total
+  note = sum(individuals_score) * 100 / 1024 # Total
   print("evaluation complete")
+  print("puzzle completion:", note, "%")
   print("")
   return (individuals_score, note)
