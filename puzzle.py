@@ -95,11 +95,11 @@ class Puzzle(object):
 
   def choose_mutation(self, ind):
     if (random.randint(0, 100) <= 50):
-      print "MUTATION POSITION"
+#      print "MUTATION POSITION"
       self.mutate_position(ind)
       return 1
     else:
-      print "MUTATION ROTATION"
+#      print "MUTATION ROTATION"
       self.mutate_position(ind)
       return 2
   
