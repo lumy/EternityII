@@ -2,14 +2,14 @@ import getpass
 import random
 import copy
 import string
-
-import matplotlib.pyplot as plt
 import numpy
 import os
 import statistics
 from deap import base
 from deap import creator
 from deap import tools
+
+import graphs
 import config
 import ind
 import eternity
@@ -70,17 +70,39 @@ class Puzzle(object):
     We have to talk about it here and see what's we're looging and if we do us a math on it.
     :return:
     """
-    self.stats = tools.Statistics(key=lambda ind: ind.fitness_ind.value)
-    # Look for multistats if we wants stat on fitness_group
-    # self.stats = tools.Statistics(key=lambda ind: ind.fitness_group.value)
-    self.stats.register("avg", statistics.mean)
+    stats1 = tools.Statistics(key=lambda ind: ind.fitness_ind.value)
+    stats2 = tools.Statistics(key=lambda ind: ind.fitness_group.value)
+    self.stats = tools.MultiStatistics(fitness_ind=stats1, fitness_group=stats2)
+    self.stats.register("avg", numpy.mean)
     self.stats.register("std", numpy.std)
     self.stats.register("min", min)
     self.stats.register("max", max)
-    self.stats.register("median", statistics.median)
     self.logbook = tools.Logbook()
-#    self.logbook.header = "generation", "fitness", "min", "avg", "max"
     self.record = None
+    # HallOfFame ?
+    # self.famous =
+
+
+  def log_stats(self, generation, n_mutation):
+    """
+      Call every iteration, log the current population and all the fitnesses
+
+    :param generation: Current number of Iteration
+    :return:
+    """
+    # Compiling the stats we ask in self.init_stats()
+    self.record = self.stats.compile(self.population)
+    ls = [(x.fitness_ind.value, x.fitness_group.value) for x in self.population]
+    fitness_ind, fitness_group = zip(*ls)
+    # Writting them in the logbook Instance
+    self.logbook.record(generations=generation, ind=fitness_ind, group=fitness_group, mutated=n_mutation, mutation_percent=config.mutate_inpd, population=self.population, **self.record)
+    # I case we need to keep famous big scores.
+    # self.famous.update(self.pop)
+
+  def write_logbook(self):
+    self.logbook.header = "generation", "mutation_percent", "mutated", "ind", "group", "population"
+    with open("%s/logbook.txt" % self.personal_path, "w") as f:
+      f.write(str(self.logbook))
 
   def evaluate(self):
     """
@@ -140,13 +162,6 @@ class Puzzle(object):
     for x in xrange(0, 256):
       yield f(l, x, 0)
 
-  def log_stats(self, generation):
-    # Compiling the stats we ask in self.init_stats()
-    self.record = self.stats.compile(self.population)
-    # Writting them in the logbook Instance
-    self.logbook.record(generations=generation, **self.record)
-    # I case we need to keep famous big scores.
-    # self.famous.update(self.pop)
 
   def __len__(self):
     return len(self.content)
@@ -155,27 +170,7 @@ class Puzzle(object):
     return repr(self.uid) + repr(self.population)
 
   def generate_graph_values(self, ngen=0):
-    """
-      Generate a graph and save it.
-    :param ngen:
-    :return:
-    """
-    nrow = [0, None, -1.0, 1.0]
-    #[-100, -75, -50, -25, 0, 25, 50, 75, 100]
-
-    # Temporary fix until we now exactly what we want to log
-    fitnesses = range(0, 256)
-    y = 0
-    for x in fitnesses:
-      plt.scatter(y, x, marker='.', c='c')
-      y += 1
-    plt.axis(nrow)
-    plt.ylabel("weight")
-    plt.xlabel("population")
-    plt.gcf().set_size_inches(15, 5)
-    plt.savefig("%s/g_%s.png" % (self.personal_path, ngen), bbox_inches='tight', dpi=100)
-    plt.clf()
-    plt.close()
+   graphs.generate_graph_weight_population([x.fitness_ind.value for x in self.population])
 
   def _get_line_(self, arr):
     i = self.index_line
@@ -188,9 +183,6 @@ class Puzzle(object):
   def draw(self):
     eternity.draw(self.population)
 
-  def write_logbook(self):
-    with open("%s/logbook.txt" % self.personal_path, "w") as f:
-      f.write(str(self.logbook))
 
   def select(self):
     removed_tils = []
