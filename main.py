@@ -52,9 +52,9 @@ def loop(puzzle):
       # How you can save a picture into your personal folder
       puzzle.save_picture(gen=i)
       # Example of call
-      removed_tils = puzzle.select()
+#      removed_tils = puzzle.select()
       # Example of call
-      puzzle.crossover(removed_tils)
+#      puzzle.crossover(removed_tils)
       # Example of call
       puzzle.mutate()
       # If you want log the different data

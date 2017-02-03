@@ -89,6 +89,42 @@ class Puzzle(object):
     self.stats.write_logbook(bin=True)
   # End Stats Function
 
+  def mutate_rotation(self, ind):
+    for x in range(random.randint(1, 3)):
+      ind.rotate()   
+    
+  def mutate_position(self, ind):
+    current = self.population.index(ind)
+    other = random.randint(0, 255)
+    while (current == other):
+      other = random.randint(0, 255)
+    self.population[current], self.population[other] = self.population[other], self.population[current]
+
+  def choose_mutation(self, ind):
+    if (random.randint(0, 100) <= 50):
+#      print "MUTATION POSITION"
+      self.mutate_position(ind)
+      return 1
+    else:
+#      print "MUTATION ROTATION"
+      self.mutate_position(ind)
+      return 2
+  
+  def mutate(self):
+    # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
+    rand_rate = config.mutate_inpd
+    rand = 0.00
+    for ind in self.population:
+      rand = random.uniform(0.000, 100.000)
+      if (rand <= rand_rate):
+        operation = self.choose_mutation(ind)
+        if (random.uniform(0.000, 100.000) <= rand_rate):
+          if (operation == 1):
+            self.mutate_position(ind)
+          else:
+            self.mutate_rotation(ind)
+          
+      
   def evaluate(self):
     """
 
