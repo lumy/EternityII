@@ -2,12 +2,13 @@ import getpass
 import random
 import copy
 import string
-import matplotlib.pyplot as plt
 import numpy
 import os
 from deap import base
 from deap import creator
 from deap import tools
+
+import graphs
 import config
 import ind
 import eternity
@@ -147,7 +148,6 @@ class Puzzle(object):
       yield f(l, x, 0)
 
 
-
   def __len__(self):
     return len(self.content)
 
@@ -160,6 +160,7 @@ class Puzzle(object):
   def generate_stats_generations(self, ftype="avg", saved=True, show=False):
     self.stats.generate_stats_generations(ftype=ftype, saved=saved, show=show)
 
+
   def _get_line_(self, arr):
     i = self.index_line
     self.index_line += 1
@@ -170,6 +171,7 @@ class Puzzle(object):
 
   def draw_generation(self, n):
     self.stats.draw_generation(n)
+
 
   def draw_all_generations(self):
     self.stats.draw_all_eternity()
