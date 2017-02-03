@@ -2,6 +2,7 @@ import numpy
 import config
 import pickle
 from deap import tools
+import eternity
 
 import graphs
 
@@ -22,11 +23,11 @@ class Stats(object):
     self.stats.register("max", max)
     self.logbook = tools.Logbook()
     # Use when Wrote to file or printed to screen
-    self.logbook.header = "generations", "mutated", "individual_fitness", "group_fitness"
+    self.logbook.header = "generations", "score", "mutated", "individual_fitness", "group_fitness"
     self.logbook.chapters['individual_fitness'].header = "min", "avg", "max"
     self.logbook.chapters['group_fitness'].header = "min", "avg", "max"
 
-  def log_stats(self, generation, population, n_mutated):
+  def log_stats(self, generation, population, n_mutated, score):
     """
       Stats to be logged:
         Generation : Represant the iteration you're on
@@ -35,6 +36,7 @@ class Stats(object):
         fitness_ind : Fitness of all individue
         group_fitness : Fitness of all groups
         population : Population at this time.
+        score : One score for the Puzzle
         record: fitness_ind and fitness_group compiled by stats. (min max avg)
     :param generation: The current iteration you're on
     :param population: The current population you're using
@@ -43,7 +45,7 @@ class Stats(object):
     """
     record = self.stats.compile(population)
     self.logbook.record(generations=generation, mutated=n_mutated, mutation_percent=config.mutate_inpd,
-                        population=population, **record)
+                        population=population, score=score, **record)
     # I case we need to keep famous big scores.
     # self.famous.update(self.pop)
 
@@ -61,9 +63,13 @@ class Stats(object):
       pickle.dump(self.logbook, open("%s/logbook.pkl" % self.personal_path, "w"))
 
   def generate_graph_per_generations(self, saved=True, show=False):
-    gen, all_inds, all_groups = self.logbook.select("generations", "individual_fitness", "group_fitness")
-    for g, inds, groups in zip(gen, all_inds, all_groups):
+    gen, all_pop = self.logbook.select("generations", "population")
+    for g, pop in zip(gen, all_pop):
+       inds,groups = zip(*[(x.fitness_ind.values[0], x.fitness_group.values[0]) for x in pop])
        self._generate_graph_per_generation(g, inds, groups, saved=saved, show=show)
+
+  def _generate_graph_per_generation(self, gen, inds, groups, saved=True, show=False):
+    graphs.generate_graph_weight_population(gen, inds, groups, saved, show, self.personal_path)
 
   def generate_stats_generations(self, ftype="avg", saved=True, show=False):
     gen = self.logbook.select("generations")
@@ -71,9 +77,18 @@ class Stats(object):
     all_groups = self.logbook.chapters["group_fitness"].select(ftype)
     graphs.generate_graph_all_data(gen, all_inds, all_groups, saved, show, self.personal_path, ftype)
 
-  def _generate_graph_per_generation(self, gen, inds, groups, saved=True, show=False):
-    graphs.generate_graph_weight_population(gen, inds, groups, saved, show, self.personal_path)
 
+  def draw_eternity(self, gen, inds, score):
+    eternity.save(inds, "%s/gen_%s_score_%s" % (self.personal_path, gen, score))
+
+  def draw_generation(self, n):
+    gen, scores, population = self.logbook.select("generations", "score", "population")
+    self.draw_eternity(gen[n], population[n], scores[n])
+
+  def draw_all_eternity(self):
+    gen, scores, population = self.logbook.select("generations", "score", "population")
+    for g, s, inds in zip(gen, scores, population):
+      self.draw_eternity(g, inds, s)
 
 def open_logboox(path):
   s = Stats("%s/logbook.pkl" % path)

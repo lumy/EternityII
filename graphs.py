@@ -7,6 +7,8 @@ def _generate_graph_weight_population(xlabel, value1, value2, saved, show, fullp
    :return:
    """
   fig, ax1 = plt.subplots()
+  print value1[0]
+  print value1[1]
   line1 = ax1.plot(value1[0], value1[1], "b.", label=value1[2])
   ax1.set_xlabel(xlabel)
   ax1.set_ylabel(value1[2], color="b")
