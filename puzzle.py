@@ -2,11 +2,9 @@ import getpass
 import random
 import copy
 import string
-
 import matplotlib.pyplot as plt
 import numpy
 import os
-import statistics
 from deap import base
 from deap import creator
 from deap import tools
@@ -15,8 +13,10 @@ import ind
 import eternity
 # Not use for now but for easier read i guess all eval code should go there.
 import eval
+import stats
 
 # Coins Hautgauche, Hautdroit, basGauche, basDroit
+
 CORNER_POS = [0, 15, 240, 255]
 # Mask des coins Hautgauche, Hautdroit, basGauche, basDroit
 MASK_CORNERS = [[0, None, None, 0], [0, 0, None, None], [None, None, 0, 0], [None, 0, 0, None]]
@@ -49,8 +49,8 @@ class Puzzle(object):
 
     self.toolbox = base.Toolbox()
     # Creation des deux valeurs
-    creator.create("FitnessInd", base.Fitness, weights=(0,))
-    creator.create("FitnessGroup", base.Fitness, weights=(0,))
+    creator.create("FitnessInd", base.Fitness, weights=(1,))
+    creator.create("FitnessGroup", base.Fitness, weights=(1,))
     # Individu creation
     creator.create("Individual", ind.Ind, fitness_ind=creator.FitnessInd, fitness_group=creator.FitnessGroup)
 
@@ -63,24 +63,26 @@ class Puzzle(object):
     # Applying rotation until it's the right side
     self.fixing_outside()
     # Init the stats we want to log
-    self.init_stats()
+    self.stats = stats.Stats(self.personal_path)
 
-  def init_stats(self):
+  # Stats Function
+  def log_stats(self, generation, n_mutated):
     """
-    We have to talk about it here and see what's we're looging and if we do us a math on it.
+    Do that at each iteration.
+    :param generation:
+    :param n_mutated:
     :return:
     """
-    self.stats = tools.Statistics(key=lambda ind: ind.fitness_ind.value)
-    # Look for multistats if we wants stat on fitness_group
-    # self.stats = tools.Statistics(key=lambda ind: ind.fitness_group.value)
-    self.stats.register("avg", statistics.mean)
-    self.stats.register("std", numpy.std)
-    self.stats.register("min", min)
-    self.stats.register("max", max)
-    self.stats.register("median", statistics.median)
-    self.logbook = tools.Logbook()
-#    self.logbook.header = "generation", "fitness", "min", "avg", "max"
-    self.record = None
+    self.stats.log_stats(generation, self.population, n_mutated)
+
+  def write_stats(self):
+    """
+    You can do that once you finished the main loop
+    :return:
+    """
+    self.stats.write_logbook()
+    self.stats.write_logbook(bin=True)
+  # End Stats Function
 
   def evaluate(self):
     """
@@ -91,7 +93,8 @@ class Puzzle(object):
     # Can be used to get these.
     values, note = eval.eval_solution(self.population)
     for ind, v in zip(self.population, values):
-      ind.fitness_ind.value = v
+      ind.fitness_ind.values = v,
+      ind.fitness_group.values = v % random.randint(1, 4),
     return
 
   #####################
@@ -140,13 +143,7 @@ class Puzzle(object):
     for x in xrange(0, 256):
       yield f(l, x, 0)
 
-  def log_stats(self, generation):
-    # Compiling the stats we ask in self.init_stats()
-    self.record = self.stats.compile(self.population)
-    # Writting them in the logbook Instance
-    self.logbook.record(generations=generation, **self.record)
-    # I case we need to keep famous big scores.
-    # self.famous.update(self.pop)
+
 
   def __len__(self):
     return len(self.content)
@@ -188,9 +185,6 @@ class Puzzle(object):
   def draw(self):
     eternity.draw(self.population)
 
-  def write_logbook(self):
-    with open("%s/logbook.txt" % self.personal_path, "w") as f:
-      f.write(str(self.logbook))
 
 
 def create_subdir(s):
