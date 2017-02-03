@@ -62,17 +62,21 @@ def get_individual_neighbor(population, index, x, y, direction):
   :return neighbor: found neighbor or `None`
   """
   neighbor = None
+  neighbor_index = None
 
   if direction == NORTH and y != 0: # y != min
-    neighbor = population[index - 16]; # (x, y - 1)
+    neighbor_index = index - 16 # (x, y - 1)
   elif direction == EAST and x != 15: # x != max
-    neighbor = population[index + 1]; # (x + 1, y)
+    neighbor_index = index + 1 # (x + 1, y)
   elif direction == SOUTH and y != 15: # y != max
-    neighbor = population[index + 16]; # (x, y + 1)
+    neighbor_index = index + 16 # (x, y + 1)
   elif direction == WEST and x != 0: # x != min
-    neighbor = population[index - 1]; # (x - 1, y)
+    neighbor_index = index - 1 # (x - 1, y)
 
-  return neighbor
+  if neighbor_index != None:
+    neighbor = population[neighbor_index]
+
+  return [neighbor, neighbor_index]
 
 def eval_individual(population, index):
   """
@@ -94,13 +98,64 @@ def eval_individual(population, index):
   ]
 
   for eval_neighbor_match in eval_neighbors_matches:
-    neighbor = eval_neighbor_match[0]
+    neighbor = eval_neighbor_match[0][0]
     individual_side = eval_neighbor_match[1]
     neighbor_side = eval_neighbor_match[2]
     if neighbor == None or individual[individual_side] == neighbor[neighbor_side]:
       score += 1;
 
   print("individual evaluation at: | index =", index, "\t| x =", x, "\t| y =", y, "\t| score =", score)
+
+  return score
+
+virgin_individuals_cluster_score = []
+
+def init_virgin_individuals_cluster_score():
+  for index in range(0, 256):
+      virgin_individuals_cluster_score.append(None);
+
+init_virgin_individuals_cluster_score();
+
+def eval_individual_cluster(population, index, individuals_score, individuals_cluster_score, score = 0, level = 0, cluster = []):
+  """
+    Evaluate the cluster's score of an individual
+  :param population: one dimension array representing the puzzle grid
+  :param index: individual's one dimensional coordinate on the grid
+  :return score: individual's score
+  """
+  individual = population[index]
+  x = index % 16; y = index / 16
+
+  if individuals_cluster_score[index] != None:
+    return individuals_cluster_score[index]
+
+  eval_neighbors_matches = [
+    # [neighbor, individual_side, neighbor_side]
+    [get_individual_neighbor(population, index, x, y, NORTH), NORTH, SOUTH],
+    [get_individual_neighbor(population, index, x, y, EAST), EAST, WEST],
+    [get_individual_neighbor(population, index, x, y, SOUTH), SOUTH, NORTH],
+    [get_individual_neighbor(population, index, x, y, WEST), WEST, EAST]
+  ]
+
+  print("cluster eval at | index =", index, "\t| x =", x, "\t| y =", y, "\t| prev score =", score, "| i score =", individuals_score[index])
+  cluster.append(index)
+  score += individuals_score[index]
+  individuals_cluster_score[index] = -1
+  for eval_neighbor_match in eval_neighbors_matches:
+    neighbor = eval_neighbor_match[0][0]
+    neighbor_index = eval_neighbor_match[0][1]
+    individual_side = eval_neighbor_match[1]
+    neighbor_side = eval_neighbor_match[2]
+    if neighbor != None and individuals_cluster_score[neighbor_index] != -1 and individual[individual_side] == neighbor[neighbor_side]:
+      print("\tGoing recursively from individual at index =", index, "into neighbor on", neighbor_index)
+      score = eval_individual_cluster(population, neighbor_index, individuals_score, individuals_cluster_score, score, level + 1, cluster);
+      print("\tGoing recursively out from neighbor at index =", neighbor_index, "into individual on", index)
+
+  if level == 0:
+    for individual_index in cluster:
+      individuals_cluster_score[individual_index] = score
+
+  print("cluster eval at | index =", index, "\t| x =", x, "\t| y =", y, "\t| cur score =", score)
 
   return score
 
@@ -115,9 +170,11 @@ def eval_solution(population):
   # print population
   # print type(population)
   # values = [eval_position(population, x) for x in range(0, 256)]
-  values = [eval_individual(population, index) for index in range(0, 256)]
+  individuals_score = [eval_individual(population, index) for index in range(0, 256)]
+  individuals_cluster_score = virgin_individuals_cluster_score
+  [eval_individual_cluster(population, index, individuals_score, individuals_cluster_score) for index in range(0, 256)]
   # Fitness = (number of good position * 100.0) / 256 (total element)
-  note = sum(values) * 100 / 256 # Total
+  note = sum(individuals_score) * 100 / 256 # Total
   print("evaluation complete")
   print("")
-  return (values, note)
+  return (individuals_score, note)
