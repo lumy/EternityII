@@ -17,24 +17,26 @@ import eternity
 import eval
 import stats
 
+# config.corner_pos = [0, 15, 240, 255]
+# config.border_left_pos = [31, 47, 63, 79, 95, 111, 127, 143, 159, 175, 191, 207, 223, 239]
+# config.border_right_pos = [16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224]
+# config.border_top_pos = range(1, 15)
+# config.border_bot_pos = range(241, 255)
+# config.inside_pos = [x for x in range(0, 255) if x not in config.corner_pos and x not in config.border_pos_pos]
+# config.border_pos_pos = config.border_top_pos + config.border_bot_pos + config.border_left_pos + config.border_right_pos
+
 # Coins Hautgauche, Hautdroit, basGauche, basDroit
 
-CORNER_POS = [0, 15, 240, 255]
 # Mask des coins Hautgauche, Hautdroit, basGauche, basDroit
 MASK_CORNERS = [[0, None, None, 0], [0, 0, None, None], [None, None, 0, 0], [None, 0, 0, None]]
-BORDER_TOP = range(1, 15)
-BORDER_BOT = range(241, 255)
-BODER_LEFT = [31, 47, 63, 79, 95, 111, 127, 143, 159, 175, 191, 207, 223, 239]
-BORDER_RIGHT = [16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224]
+
 # Tout les position de X pour les Bords
-BORDER_POS = BORDER_TOP + BORDER_BOT + BODER_LEFT + BORDER_RIGHT
 # Represent les mask des Bordures
 MASK_TOP = [0, None, None, None]
 MASK_BOT = [None, None, 0, None]
 MASK_LEFT = [None, 0, None, None]
 MASK_RIGHT = [None, None, None, 0]
 # Toutes les positions de X en dehors des coins et des bords
-INSIDE_POS = [x for x in range(0, 255) if x not in CORNER_POS and x not in BORDER_POS]
 
 class Puzzle(object):
   """
@@ -96,9 +98,9 @@ class Puzzle(object):
 
   def mutate_position(self, ind):
     current = self.population.index(ind)
-    other = random.randint(1, 254)
-    while (current == other or other in CORNER_POS or other in BORDER_POS):
-      other = random.randint(1, 254)
+    other = random.randint(1, config.total - 1)
+    while (current == other or other in config.corner_pos or other in config.border_pos):
+      other = random.randint(1, config.total - 1)
     self.population[current], self.population[other] = self.population[other], self.population[current]
 
   def choose_mutation(self, ind):
@@ -115,9 +117,8 @@ class Puzzle(object):
     mutation_counter = 0
     # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
     rand_rate = config.mutate_inpd
-    rand = 0.00
     for i, ind in enumerate(self.population):
-      if i not in CORNER_POS and i not in BORDER_POS:
+      if i not in config.corner_pos and i not in config.border_pos:
         rand = random.uniform(0.000, 100.000)
         if (rand <= rand_rate):
           mutation_counter += 1
@@ -158,7 +159,7 @@ class Puzzle(object):
     removed_tils = []
     selection_ind_value = min(self.population, key=lambda k:k.fitness_group.values).fitness_group.values
     # Get nb tils to remove
-    nb_to_remove = (100.0 - config.elitism_percentage) * 256.0 / 100.0
+    nb_to_remove = int((100 - config.elitism_percentage) * float(config.total) / 100)
     # Select algorithm
     while nb_to_remove > 0:
       for i, ind in enumerate(self.population):
@@ -183,9 +184,9 @@ class Puzzle(object):
       ind.rotates(random.randint(0, 4))
     for i, ind in enumerate(self.population):
       if ind is None:
-        if i in CORNER_POS:
+        if i in config.corner_pos:
           self.population[i] = list_corner.pop()
-        elif i in BORDER_POS:
+        elif i in config.border_pos:
           self.population[i] = list_border.pop()
         else:
           self.population[i] = list_center.pop(random.randrange(len(list_center)))
@@ -196,15 +197,15 @@ class Puzzle(object):
   #  Tools function   #
   #####################
   def fixing_outside(self):
-    for index, mask in zip(CORNER_POS, MASK_CORNERS):
+    for index, mask in zip(config.corner_pos, MASK_CORNERS):
       self.fit_to_border(self.population[index], mask)
-    for index in BORDER_BOT:
+    for index in config.border_bot_pos:
       self.fit_to_border(self.population[index], MASK_BOT)
-    for index in BORDER_TOP:
+    for index in config.border_top_pos:
       self.fit_to_border(self.population[index], MASK_TOP)
-    for index in BODER_LEFT:
+    for index in config.border_left_pos:
       self.fit_to_border(self.population[index], MASK_LEFT)
-    for index in BORDER_RIGHT:
+    for index in config.border_right_pos:
       self.fit_to_border(self.population[index], MASK_RIGHT)
 
   def fit_to_border(self, ind, type):
@@ -230,12 +231,12 @@ class Puzzle(object):
       Trying to have an half randomize algorithm
     :return:
     """
-    lc = self.give_random_pos(copy.copy(CORNER_POS), lc)
-    lb = self.give_random_pos(copy.copy(BORDER_POS), lb)
-    li = self.give_random_pos(copy.copy(INSIDE_POS), li)
+    lc = self.give_random_pos(copy.copy(config.corner_pos), lc)
+    lb = self.give_random_pos(copy.copy(config.border_pos), lb)
+    li = self.give_random_pos(copy.copy(config.inside_pos), li)
     l = lc + lb + li
     f = lambda lst, index, c: lst[c][1] if lst[c][0] == index else f(lst, index, c + 1)
-    for x in xrange(0, 256):
+    for x in xrange(0, len(l)):
       yield f(l, x, 0)
 
 
@@ -280,5 +281,5 @@ if __name__ == '__main__':
   border = [i for i in inds if i[1].count(0) == 1]
   inside = [i for i in inds if i[1].count(0) == 0]
   puzzle = Puzzle((corner, border, inside))
-  puzzle.draw()
+ # puzzle.draw()
 #  puzzle.save_picture()

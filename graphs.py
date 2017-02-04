@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 
+import config
+
 
 def _generate_graph_weight_population(xlabel, value1, value2, saved, show, fullpath):
   """
@@ -38,8 +40,8 @@ def generate_graph_weight_population(generation, fits_ind, fits_group, saved, sh
        :return:
        """
       xlabel = "Population @ %s" % generation
-      inds = (range(0, 256), fits_ind, "Individual Fitness")
-      groups = (range(0, 256), fits_group, "Groups Fitness")
+      inds = (range(0, config.total), fits_ind, "Individual Fitness")
+      groups = (range(0, config.total), fits_group, "Groups Fitness")
       _generate_graph_weight_population(xlabel, inds, groups, saved, show, "%s/ind_group_gen%s.png" % (path, generation))
 
 def generate_graph_all_data(generations, fits_ind, fits_group, saved, show, path, ftype):

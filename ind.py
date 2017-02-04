@@ -3,12 +3,15 @@ Use to represent an individual a 4 int direciton and a rotation. (and an uid to 
 """
 import copy
 
+import config
+
+
 def get_population():
   """
   Load the basic Population from the file e2pieces.txt
   :return: a list of int
   """
-  with open("e2pieces.txt") as f:
+  with open(config.population_file_base) as f:
     l = f.readlines()
   l = [(x + 1, [int(i) for i in l[x].split()]) for x in range(0, len(l))]
   return l

@@ -16,7 +16,8 @@ def _load_file(s):
   try:
     with open(s, "r") as e:
       return dill.load(e)
-  except Exception:
+  except Exception as e:
+    print e
     return None
 
 def load_population():
@@ -60,13 +61,14 @@ def loop(puzzle):
       # If you want log the different data
       puzzle.log_stats(i, n_mutated)
       # you may want to generate some graph
-
     # END LOOP
     # You may want to save the log book
     puzzle.write_stats()
     puzzle.draw_all_generations()
     # you may want to generate some graph
     puzzle.generate_stats_generations(ftype="avg")
+    puzzle.generate_stats_generations(ftype="min")
+    puzzle.generate_stats_generations(ftype="max")
     puzzle.generate_graph_per_generations()
     # TODO implement
     save_population(puzzle)
