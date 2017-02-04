@@ -96,9 +96,9 @@ class Puzzle(object):
 
   def mutate_position(self, ind):
     current = self.population.index(ind)
-    other = random.randint(0, 255)
-    while (current == other):
-      other = random.randint(0, 255)
+    other = random.randint(1, 254)
+    while (current == other or other in CORNER_POS or other in BORDER_POS):
+      other = random.randint(1, 254)
     self.population[current], self.population[other] = self.population[other], self.population[current]
 
   def choose_mutation(self, ind):
@@ -116,16 +116,17 @@ class Puzzle(object):
     # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
     rand_rate = config.mutate_inpd
     rand = 0.00
-    for ind in self.population:
-      rand = random.uniform(0.000, 100.000)
-      if (rand <= rand_rate):
-        mutation_counter += 1
-        operation = self.choose_mutation(ind)
-        if (random.uniform(0.000, 100.000) <= rand_rate):
-          if (operation == 1):
-            self.mutate_position(ind)
-          else:
-            self.mutate_rotation(ind)
+    for i, ind in enumerate(self.population):
+      if i not in CORNER_POS and i not in BORDER_POS:
+        rand = random.uniform(0.000, 100.000)
+        if (rand <= rand_rate):
+          mutation_counter += 1
+          operation = self.choose_mutation(ind)
+          if (random.uniform(0.000, 100.000) <= rand_rate):
+            if (operation == 1):
+              self.mutate_position(ind)
+            else:
+              self.mutate_rotation(ind)
     return mutation_counter
 
   def evaluate(self):
