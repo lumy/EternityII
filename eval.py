@@ -1,6 +1,8 @@
 from __future__ import print_function
 import copy
 
+import config
+
 NORTH = 0
 EAST = 1
 SOUTH = 2
@@ -9,7 +11,7 @@ WEST = 3
 virgin_score_list = []
 
 def init_virgin_scores_list():
-  for index in range(0, 256):
+  for index in range(0, config.total):
       virgin_score_list.append(None);
 
 init_virgin_scores_list()
@@ -29,11 +31,11 @@ def get_individual_neighbor(population, index, x, y, direction):
   neighbor_index = None
 
   if direction == NORTH and y != 0: # y != min
-    neighbor_index = index - 16 # (x, y - 1)
-  elif direction == EAST and x != 15: # x != max
+    neighbor_index = index - config.size_line # (x, y - 1)
+  elif direction == EAST and x != (config.size_line - 1): # x != max
     neighbor_index = index + 1 # (x + 1, y)
-  elif direction == SOUTH and y != 15: # y != max
-    neighbor_index = index + 16 # (x, y + 1)
+  elif direction == SOUTH and y != config.size_line - 1: # y != max
+    neighbor_index = index + config.size_line # (x, y + 1)
   elif direction == WEST and x != 0: # x != min
     neighbor_index = index - 1 # (x - 1, y)
 
@@ -56,7 +58,8 @@ def eval_individual(population, index, individuals_score, individuals_cluster_sc
   :return cluster_score: individual's cluster's score
   """
   individual = population[index]
-  x = index % 16; y = index / 16
+  x = index % config.size_line
+  y = index / config.size_line
   individual_score = 0
 
   # print("Evaluating individual\t\t\t\t( index:", index, ")\t( x:", x, "| y:", y, ")")
@@ -85,11 +88,11 @@ def eval_individual(population, index, individuals_score, individuals_cluster_sc
     neighbor_side = eval_neighbor_match[2]
     # evaluate individual and neighbor corresponding sides
     if neighbor == None or individual[individual_side] == neighbor[neighbor_side]:
-      individual_score += 1;
+      individual_score += 1
     # crawl (or not) and evaluate individuals cluster
     if neighbor != None and individuals_cluster_score[neighbor_index] != -1 and individual[individual_side] == neighbor[neighbor_side]:
       # print("[ + ] Crawling cluster from individual\t\t( index:", index, ")\tto neighbor ( index:", neighbor_index, ")")
-      cluster_score = eval_individual(population, neighbor_index, individuals_score, individuals_cluster_score, cluster_score, level + 1, cluster);
+      cluster_score = eval_individual(population, neighbor_index, individuals_score, individuals_cluster_score, cluster_score, level + 1, cluster)
       # print("[ - ] Crawling out cluster from neighbor\t( index:", neighbor_index, ")\tto individual ( index:", index, ")")
 
   individuals_score[index] = individual_score
@@ -120,9 +123,8 @@ def eval_solution(population):
   """
   individuals_score = copy.deepcopy(virgin_score_list)
   individuals_cluster_score = copy.deepcopy(virgin_score_list)
-  puzzle_completion = 0.0
 
-  for index in range(0, 256):
+  for index in range(0, len(population)):
     eval_individual(population, index, individuals_score, individuals_cluster_score)
   puzzle_completion = sum(individuals_score) * 100.0 / 1024.0
 
