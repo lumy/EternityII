@@ -151,7 +151,6 @@ class Puzzle(object):
     # print "puzzle completion:", puzzle_completion, "%\n"
 
     self.completion = puzzle_completion
-    print config.score_group_max
     for individual, individual_s, cluster_s in zip(self.population, individuals_s, individuals_clusters_s):
       individual.fitness_ind.values = individual_s,
       individual.fitness_group.values = cluster_s,
