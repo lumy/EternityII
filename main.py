@@ -61,23 +61,17 @@ def loop(puzzle):
       # If you want log the different data
       puzzle.log_stats(i, n_mutated)
       # you may want to generate some graph
-    print "Ended: ", config.NGEN, " generation\nWritting Stats file."
     # END LOOP
     # You may want to save the log book
     puzzle.write_stats()
     puzzle.draw_all_generations()
     # you may want to generate some graph
-    print "Drawing avg for each generation"
     puzzle.generate_stats_generations(ftype="avg")
-    print "Drawing min for each generation"
     puzzle.generate_stats_generations(ftype="min")
-    print "Drawing max for each generation"
     puzzle.generate_stats_generations(ftype="max")
-    print "Drawing Every Weight per Generations"
     puzzle.generate_graph_per_generations()
     # TODO implement
     save_population(puzzle)
-    print "Ended Saving Data"
 
 def main():
   try:
