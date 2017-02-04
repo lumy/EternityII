@@ -58,6 +58,7 @@ def _show_game(l):
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         return
+  pygame.quit()
 
 def _prepare(linds):
   if len(IPIECES) == 0:
@@ -80,8 +81,8 @@ def draw(linds):
 
 def save(linds, file_path):
   lfinal = _prepare(linds)
-  screen = pygame.display.set_mode((960, 960))
-  pygame.display.iconify()
+  screen = pygame.Surface((960, 960))
+  #pygame.display.iconify()
   x, y = 0, 0
   screen.fill((0, 0, 0))
   for ind in lfinal:
@@ -91,6 +92,7 @@ def save(linds, file_path):
       x = 0
       y += 60
   pygame.image.save(screen, "%s.jpeg" % file_path)
+  pygame.quit()
 
 if __name__ == '__main__':
   l = []
