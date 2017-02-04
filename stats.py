@@ -29,7 +29,7 @@ class Stats(object):
     self.stats.register("max", max)
     self.logbook = tools.Logbook()
     # Use when Wrote to file or printed to screen
-    self.logbook.header = "generations", "score", "mutated", "individual_fitness", "group_fitness", "population"
+    self.logbook.header = "generations", "score", "mutated", "individual_fitness", "group_fitness"
     self.logbook.chapters['individual_fitness'].header = "min", "avg", "max"
     self.logbook.chapters['group_fitness'].header = "min", "avg", "max"
 
