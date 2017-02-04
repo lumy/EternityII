@@ -51,8 +51,6 @@ def loop(puzzle):
     for i in range(0, config.NGEN):
       # Evaluate the entire population
       puzzle.evaluate()
-      # How you can save a picture into your personal folder
-      puzzle.save_picture(gen=i)
       # Example of call
       removed_tils = puzzle.select()
       # Example of call
