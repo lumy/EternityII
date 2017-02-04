@@ -28,6 +28,7 @@ def _generate_graph_weight_population(xlabel, value1, value2, saved, show, fullp
     plt.show()
   if saved:
     plt.savefig(fullpath, bbox_inches='tight', dpi=100)
+  plt.close()
 
 def generate_graph_weight_population(generation, fits_ind, fits_group, saved, show, path):
       """
