@@ -94,6 +94,8 @@ class Puzzle(object):
 
 
   def mutate_position(self, ind):
+    if len(config.inside_pos) <= 1:
+      return
     current = self.population.index(ind)
     other = random.randint(1, config.total - 1)
     while (current == other or other in config.corner_pos or other in config.border_pos):
