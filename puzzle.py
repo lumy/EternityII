@@ -104,7 +104,7 @@ class Puzzle(object):
     mutation_counter = 0
     for i, ind in enumerate(self.population):
       if i not in config.corner_pos and i not in config.border_pos:
-        rand = random.uniform(0, 100)
+        rand = random.uniform(0, 1)
         if (rand <= config.mutate_inpd):
           mutation_counter += 1
           operation = random.randint(1, 3)
