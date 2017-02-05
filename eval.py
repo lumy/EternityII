@@ -126,6 +126,6 @@ def eval_solution(population):
 
   for index in range(0, len(population)):
     eval_individual(population, index, individuals_score, individuals_cluster_score)
-  puzzle_completion = sum(individuals_score) * 100.0 / 1024.0
+  puzzle_completion = sum(individuals_score) * 100.0 / config.score_group_max
 
   return (individuals_score, individuals_cluster_score, puzzle_completion)
