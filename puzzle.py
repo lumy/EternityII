@@ -108,7 +108,7 @@ class Puzzle(object):
         if (rand <= config.mutate_inpd):
           mutation_counter += 1
           operation = random.randint(1, 3)
-          # operation == 3 both if work, operation == 2 only the first one and for operation == 1 only the second one.
+          # operation == 1 mutate rotation # operation == 2 mutate position # operation == 3 mutate both
           if (operation >= 2):
             self.mutate_position(ind)
             operation -= 2
