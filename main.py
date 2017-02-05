@@ -1,6 +1,5 @@
 import os
-import pickle
-
+import timed_loop
 import dill as dill
 
 import ind
@@ -42,45 +41,61 @@ def save_population(puzzle):
     dill.dump(puzzle, f)
   print "Saved @%s" % config.population_file_saved
 
-def loop(puzzle):
-    """
-      We Assume that the population is new an just setup and need to be eval first
-    :param args:
-    :param kwargs:
-    :return:
-    """
-    for i in range(0, config.NGEN):
-      # Evaluate the entire population
-      puzzle.evaluate()
-      # Example of call
-      removed_tils = puzzle.select()
-      # Example of call
-      puzzle.crossover(removed_tils)
-      # Example of call
-      n_mutated = puzzle.mutate()
-      # If you want log the different data
-      puzzle.log_stats(i, n_mutated)
-      # you may want to generate some graph
-    # END LOOP
-    # You may want to save the log book
-    puzzle.write_stats()
-    puzzle.draw_all_generations()
-    # you may want to generate some graph
-    puzzle.generate_stats_generations(ftype="avg")
-    puzzle.generate_stats_generations(ftype="min")
-    puzzle.generate_stats_generations(ftype="max")
-    puzzle.generate_graph_per_generations()
-    # TODO implement
-    save_population(puzzle)
+def one_turn(puzzle, generation):
+  # Example of call
+  removed_tils = puzzle.select()
+  # Example of call
+  puzzle.crossover(removed_tils)
+  # Example of call
+  n_mutated = puzzle.mutate()
+  # Evaluate the entire population
+  puzzle.evaluate()
+  # If you want log the different data
+  puzzle.log_stats(generation, n_mutated)
+  if puzzle.population[0].fitness_group.values[0] == config.score_group_max:
+    return True
+  return False
 
-def main():
+def _loop(puzzle):
+  """
+    We Assume that the population is new an just setup and need to be eval first
+  :param args:
+  :param kwargs:
+  :return:
+  """
+  for i in range(0, config.NGEN):
+    if one_turn(puzzle, i):
+      return True
+  return False
+
+def loop(puzzle):
+  s = _loop(puzzle)
+  if s:
+    print "Solution Found !"
+  else:
+    print "No Solution Look at the logbook."
+  # END LOOP
+  # You may want to save the log book
+  puzzle.write_stats()
+  # puzzle.draw_all_generations()
+  # you may want to generate some graph
+  puzzle.generate_stats_generations(ftype="avg")
+  # puzzle.generate_stats_generations(ftype="min")
+  # puzzle.generate_stats_generations(ftype="max")
+  # puzzle.generate_graph_per_generations()
+  save_population(puzzle)
+
+def main(timed=False):
   try:
     os.mkdir("./gen/")
   except Exception as e:
     print e
   puzzle = load_population()
-  loop(puzzle)
-
+  if timed:
+    timed_loop.timed_loop(puzzle, one_turn)
+  else:
+    loop(puzzle)
 
 if __name__ == '__main__':
-  main()
+  timed = False
+  main(timed=timed)
