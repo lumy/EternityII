@@ -92,9 +92,6 @@ class Puzzle(object):
     self.stats.write_logbook(bin=True)
   # End Stats Function
 
-  def mutate_rotation(self, ind):
-    for x in range(random.randint(1, 3)):
-      ind.rotate()
 
   def mutate_position(self, ind):
     current = self.population.index(ind)
@@ -103,31 +100,20 @@ class Puzzle(object):
       other = random.randint(1, config.total - 1)
     self.population[current], self.population[other] = self.population[other], self.population[current]
 
-  def choose_mutation(self, ind):
-    if (random.randint(0, 100) <= 50):
-#      print "MUTATION POSITION"
-      self.mutate_position(ind)
-      return 1
-    else:
-#      print "MUTATION ROTATION"
-      self.mutate_position(ind)
-      return 2
-
   def mutate(self):
     mutation_counter = 0
-    # CONST RAND RATE <!> TO UPDATE WHEN RAND RATE IMPLEMENTED
-    rand_rate = config.mutate_inpd
     for i, ind in enumerate(self.population):
       if i not in config.corner_pos and i not in config.border_pos:
-        rand = random.uniform(0.000, 100.000)
-        if (rand <= rand_rate):
+        rand = random.uniform(0, 1)
+        if (rand <= config.mutate_inpd):
           mutation_counter += 1
-          operation = self.choose_mutation(ind)
-          if (random.uniform(0.000, 100.000) <= rand_rate):
-            if (operation == 1):
-              self.mutate_position(ind)
-            else:
-              self.mutate_rotation(ind)
+          operation = random.randint(1, 3)
+          # operation == 1 mutate rotation # operation == 2 mutate position # operation == 3 mutate both
+          if (operation >= 2):
+            self.mutate_position(ind)
+            operation -= 2
+          if operation >= 1:
+            ind.rotates(random.randint(1, 3))
     return mutation_counter
 
   def evaluate(self):
