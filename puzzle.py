@@ -148,13 +148,17 @@ class Puzzle(object):
     selection_ind_value = min(self.population, key=lambda k:k.fitness_group.values).fitness_group.values
     # Get nb tils to remove
     nb_to_remove = int((100 - config.elitism_percentage) * float(config.total) / 100)
+    # Create and randomize indexes list
+    indexes = list(range(1, 255))
+    random.shuffle(indexes)
     # Select algorithm
     while nb_to_remove > 0:
-      for i, ind in enumerate(self.population):
-        if nb_to_remove > 0 and i > 0 and ind is not None and \
-            ind.fitness_ind.values != 4 and ind.fitness_group.values == selection_ind_value:
+      for i in indexes:
+        if nb_to_remove > 0 and i > 0 and self.population[i] is not None and \
+            self.population[i].fitness_ind.values != 4 and \
+            self.population[i].fitness_group.values == selection_ind_value:
+          removed_tils.append(self.population[i])
           self.population[i] = None
-          removed_tils.append(ind)
           nb_to_remove -= 1
       selection_ind_value = (selection_ind_value[0] + config.selection_ind_value_step,)
     return removed_tils
