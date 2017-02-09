@@ -93,29 +93,40 @@ class Puzzle(object):
   # End Stats Function
 
 
-  def mutate_position(self, ind):
-    if len(config.inside_pos) <= 1:
+  def mutate_position(self, index, list_positions):
+    """
+      If only one position in the list position will return (could do but it would be an useless procs calls.
+    :param index:
+    :param list_positions:
+    :return:
+    """
+    if len(list_positions) <= 1:
       return
-    current = self.population.index(ind)
-    other = random.randint(1, config.total - 1)
-    while (current == other or other in config.corner_pos or other in config.border_pos):
-      other = random.randint(1, config.total - 1)
-    self.population[current], self.population[other] = self.population[other], self.population[current]
+    other = index
+    while (index == other):
+      other = random.randint(0, len(list_positions) - 1)
+    self.population[index], self.population[list_positions[other]] = self.population[list_positions[other]], self.population[index]
+
+  def _mutate(self, positions):
+    mutated = 0
+    for x in positions:
+      if random.uniform(0, 1) <= config.mutate_inpd:
+        mutated += 1
+        operation = random.randint(1, 3)
+        # operation == 1 mutate rotation # operation == 2 mutate position # operation == 3 mutate both
+        if operation >= 2:
+          self.mutate_position(x, positions)
+          operation -= 2
+        if operation >= 1:
+          self.population[x].rotates(random.randint(1, 3))
+    return mutated
+
 
   def mutate(self):
-    mutation_counter = 0
-    for i, ind in enumerate(self.population):
-      if i not in config.corner_pos and i not in config.border_pos:
-        rand = random.uniform(0, 1)
-        if (rand <= config.mutate_inpd):
-          mutation_counter += 1
-          operation = random.randint(1, 3)
-          # operation == 1 mutate rotation # operation == 2 mutate position # operation == 3 mutate both
-          if (operation >= 2):
-            self.mutate_position(ind)
-            operation -= 2
-          if operation >= 1:
-            ind.rotates(random.randint(1, 3))
+    mutation_counter = self._mutate(config.inside_pos)
+    mutation_counter += self._mutate(config.border_pos)
+    mutation_counter += self._mutate(config.corner_pos)
+    self.fixing_outside()
     return mutation_counter
 
   def evaluate(self):
