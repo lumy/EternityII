@@ -151,7 +151,8 @@ class Puzzle(object):
     # Select algorithm
     while nb_to_remove > 0:
       for i, ind in enumerate(self.population):
-        if nb_to_remove > 0 and i > 0 and ind is not None and ind.fitness_group.values == selection_ind_value:
+        if nb_to_remove > 0 and i > 0 and ind is not None and \
+            ind.fitness_ind.values != 4 and ind.fitness_group.values == selection_ind_value:
           self.population[i] = None
           removed_tils.append(ind)
           nb_to_remove -= 1
