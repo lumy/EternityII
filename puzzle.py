@@ -163,7 +163,6 @@ class Puzzle(object):
           self.population[i] = None
           nb_to_remove -= 1
       selection_ind_value = (selection_ind_value[0] + config.selection_ind_value_step,)
-    #   print "removed_tils len : ", len(removed_tils)
     return removed_tils
 
   def crossover(self, removed_tils):
