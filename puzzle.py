@@ -185,13 +185,15 @@ class Puzzle(object):
         else:
           self.population[i] = list_center.pop()
           # Check for best rotation
-        #   rotation = 0
-        #   fitness = eval.eval_individual_score(self.population, i)
-        #   for r in (range(1, 4)):
-        #     self.population[i].rotate()
-        #     if eval.eval_individual_score(self.population, i) > fitness:
-        #       fitness = eval.eval_individual_score(self.population, i)
-        #       rotation = r
+          rotation = 0
+          fitness = eval.eval_individual_score(self.population, i)
+          for r in (range(1, 4)):
+            self.population[i].rotate()
+            if eval.eval_individual_score(self.population, i) > fitness:
+              fitness = eval.eval_individual_score(self.population, i)
+              rotation = r
+          for r in (range(0, rotation)):
+            self.population[i].rotate()
     # Applying rotation until it's the right side
     self.fixing_outside()
 

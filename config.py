@@ -22,10 +22,8 @@ border_pos = border_top_pos + border_bot_pos  + border_left_pos + border_right_p
 inside_pos = [x for x in range(0, total) if x not in corner_pos and x not in border_pos]
 
 score_group_max = 4 * total
-NGEN = 1000
+NGEN = 2000
 
-mutate_inpd=0.4
 selection_ind_value_step=1
 elitism_percentage_start=10
-elitism_percentage_up=5
-gen_modulo_elitism=100
+gen_modulo_elitism=200
