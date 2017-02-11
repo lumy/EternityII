@@ -36,7 +36,7 @@ if ! [ $1 ]; then
     exit 1
 fi
 
-cd "$1"
+cd "$1/images"
 
 create_symbolic_links
 

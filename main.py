@@ -77,16 +77,11 @@ def loop(puzzle):
     print "Solution Found !"
   else:
     print "No Solution Look at the logbook."
-  # END LOOP
-  # You may want to save the log book
+  # Saving logbook
   puzzle.write_stats()
-  # puzzle.draw_all_generations()
   # you may want to generate some graph
-  puzzle.generate_stats_generations(ftype="avg")
-  # puzzle.generate_stats_generations(ftype="min")
-  # puzzle.generate_stats_generations(ftype="max")
-  # puzzle.generate_graph_per_generations()
-  save_population(puzzle)
+  # We should not need that anymore since it's supposed to be the last population in the file.
+  #save_population(puzzle)
 
 def main(timed=False):
   try:
