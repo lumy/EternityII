@@ -27,5 +27,5 @@ NGEN = 2000
 mutate_inpd=0.001
 selection_ind_value_step=1
 elitism_percentage_start=10
-elitism_percentage_up=8
-gen_modulo_elitism=200
+elitism_percentage_up=4
+gen_modulo_elitism=100

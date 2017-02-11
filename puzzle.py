@@ -151,7 +151,7 @@ class Puzzle(object):
     # Get nb tils to remove
     nb_to_remove = int((100 - config.elitism_percentage_start) * float(config.total) / 100)
     # Create and randomize indexes list
-    indexes = list(range(1, 255))
+    indexes = list(range(1, config.total))
     random.shuffle(indexes)
     # Select algorithm
     while nb_to_remove > 0:
