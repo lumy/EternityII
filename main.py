@@ -100,4 +100,4 @@ def main(write_stats, timed=False):
 
 if __name__ == '__main__':
   timed = False
-  main(False, timed=timed)
+  main(True, timed=timed)
