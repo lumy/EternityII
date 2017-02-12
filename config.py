@@ -8,10 +8,16 @@ population_file_saved="try01.dill"
 # population_file_base="test_9pieces.txt"
 population_file_base="e2pieces.txt"
 
-NGEN = 200
-mutate_inpd=0.4
+# NGEN % gen_modulo_elitism : 2000 / 100 = 20
+# 20 * elitism_percentage_up : 20 * 4 = 80
+# 80 + elitism_percentage_start : 80 + 10 = 90
+# elitism_percentage_end = 90
+NGEN = 2000
+mutate_inpd=0.01
 selection_ind_value_step=1
 elitism_percentage=10
+elitism_percentage_up=4
+gen_modulo_elitism=100
 
 # values dynamically computed with init()
 initialized = False

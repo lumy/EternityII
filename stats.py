@@ -1,12 +1,6 @@
-import numpy
-import config
-import pickle
+import numpy, os, config, pickle, eternity, graphs
 from deap import tools
-import eternity
-
-import graphs
-
-
+import progressbar
 
 def get_group_val(ind):
   return ind.fitness_group.values
@@ -27,9 +21,13 @@ class Stats(object):
     self.stats.register("avg", numpy.mean)
     self.stats.register("min", min)
     self.stats.register("max", max)
+    self.init_book()
+
+  def init_book(self):
     self.logbook = tools.Logbook()
+    self.populations = []
     # Use when Wrote to file or printed to screen
-    self.logbook.header = "generations", "score", "mutated", "individual_fitness", "group_fitness"
+    self.logbook.header = "generations", "score", "mutation_percent", "mutated", "individual_fitness", "group_fitness"
     self.logbook.chapters['individual_fitness'].header = "min", "avg", "max"
     self.logbook.chapters['group_fitness'].header = "min", "avg", "max"
 
@@ -50,8 +48,9 @@ class Stats(object):
     :return:
     """
     record = self.stats.compile(population)
+    self.populations.append(population)
     self.logbook.record(generations=generation, mutated=n_mutated, mutation_percent=config.mutate_inpd,
-                        population=population, score=score, **record)
+                        score=score, **record)
     # I case we need to keep famous big scores.
     # self.famous.update(self.pop)
 
@@ -64,18 +63,34 @@ class Stats(object):
     """
     if not bin:
       with open("%s/logbook.txt" % self.personal_path, "w") as f:
-        f.write(str(self.logbook))
+        f.write("%s\n" % str(self.logbook))
     else:
       pickle.dump(self.logbook, open("%s/logbook.pkl" % self.personal_path, "w"))
 
+  def write(self):
+    self.write_logbook()
+    self.write_logbook(bin=True)
+    self.free_memory()
+
+  def free_memory(self):
+    pickle.dump(self.populations, open("%s/populations.pkl" % self.personal_path, "a"))
+    self.populations = []
+
   def generate_graph_per_generations(self, saved=True, show=False):
-    gen, all_pop = self.logbook.select("generations", "population")
+    gen, all_pop = self.logbook.select("generations"), self.populations
+    try:
+      os.mkdir("%s/graphs/" % self.personal_path)
+    except Exception as e:
+      print e
+    pbar = progressbar.ProgressBar(widgets=[progressbar.Percentage(), progressbar.Bar()],
+                                   maxval=len(self.populations)).start()
     for g, pop in zip(gen, all_pop):
-       inds,groups = zip(*[(x.fitness_ind.values[0], x.fitness_group.values[0]) for x in pop])
-       self._generate_graph_per_generation(g, inds, groups, saved=saved, show=show)
+      inds,groups = zip(*[(x.fitness_ind.values[0], x.fitness_group.values[0]) for x in pop])
+      self._generate_graph_per_generation(g, inds, groups, saved=saved, show=show)
+      pbar.update(g + 2)
 
   def _generate_graph_per_generation(self, gen, inds, groups, saved=True, show=False):
-    graphs.generate_graph_weight_population(gen, inds, groups, saved, show, self.personal_path)
+    graphs.generate_graph_weight_population(gen, inds, groups, saved, show, "%s/graphs/" % self.personal_path)
 
   def generate_stats_generations(self, ftype="avg", saved=True, show=False):
     gen = self.logbook.select("generations")
@@ -85,18 +100,46 @@ class Stats(object):
 
 
   def draw_eternity(self, gen, inds, score):
-    eternity.save(inds, "%s/gen_%s_score_%s" % (self.personal_path, gen, score))
-
-  def draw_generation(self, n):
-    gen, scores, population = self.logbook.select("generations", "score", "population")
-    self.draw_eternity(gen[n], population[n], scores[n])
+    eternity.save(inds, "%s/images/gen_%s_score_%s" % (self.personal_path, gen, score))
 
   def draw_all_eternity(self):
-    gen, scores, population = self.logbook.select("generations", "score", "population")
-    for g, s, inds in zip(gen, scores, population):
+    gen, scores = self.logbook.select("generations", "score")
+    try:
+      os.mkdir("%s/images/" % self.personal_path)
+    except Exception as e:
+      print e
+    pbar = progressbar.ProgressBar(widgets=[progressbar.Percentage(), progressbar.Bar()], maxval=len(self.populations)).start()
+    for g, s, inds in zip(gen, scores, self.populations):
       self.draw_eternity(g, inds, s)
+      pbar.update(g + 1)
 
 def open_logboox(path):
   s = Stats("%s/logbook.pkl" % path)
-  s.logbook = pickle.load(open("%s/logbook.pkl" % path, "r"))
+  with open("%s/logbook.pkl" % path, "r") as f:
+      s.logbook = pickle.load(f)
+  s.populations = open_population(path)
+  s.personal_path = path
   return s
+
+def open_population(path):
+  ret = []
+  with open("%s/populations.pkl" % path, "r") as f:
+    try:
+      while True:
+        ret.extend(pickle.load(f))
+    except EOFError:
+      pass
+  return ret
+
+if __name__ == '__main__':
+  g = "gen/lumy_11-02-2017_20h.49m.59s/"
+  import puzzle
+  puzzle.Puzzle.dynamique_type()
+  stats = open_logboox(g)
+  stats.draw_all_eternity()
+  stats.generate_stats_generations(ftype="avg")
+  stats.generate_stats_generations(ftype="min")
+  stats.generate_stats_generations(ftype="max")
+  stats.generate_graph_per_generations(saved=True, show=False)
+
+#  print s.logbook

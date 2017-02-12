@@ -43,7 +43,7 @@ def save_population(puzzle):
 
 def one_turn(puzzle, generation, write_stats):
   # Example of call
-  removed_tils = puzzle.select()
+  removed_tils = puzzle.select(generation)
   # Example of call
   puzzle.crossover(removed_tils)
   # Example of call
@@ -67,6 +67,9 @@ def _loop(puzzle, write_stats):
   for i in range(0, config.NGEN):
     if one_turn(puzzle, i, write_stats):
       return True
+  if i % 500 == 0 and i != 0:
+    # Write the populations to a file to free some memory
+    puzzle.stats.free_memory()
   return False
 
 def loop(puzzle, write_stats):
@@ -75,17 +78,13 @@ def loop(puzzle, write_stats):
     print "Solution Found !"
   else:
     print "No Solution Look at the logbook."
-  # END LOOP
   if write_stats:
-    # You may want to save the log book
+    # Saving logbook
     puzzle.write_stats()
-    # puzzle.draw_all_generations()
     # you may want to generate some graph
-    puzzle.generate_stats_generations(ftype="avg")
-    # puzzle.generate_stats_generations(ftype="min")
-    # puzzle.generate_stats_generations(ftype="max")
-    # puzzle.generate_graph_per_generations()
-    save_population(puzzle)
+    # We should not need that anymore since it's supposed to be the last population in the file.
+    #save_population(puzzle)
+  # END LOOP
 
 def main(write_stats, timed=False):
   try:
