@@ -42,6 +42,15 @@ class Puzzle(object):
   """
   Represant the game. Contain a population of each and get One fitnessValue.
   """
+  @staticmethod
+  def dynamique_type():
+    # Creation des deux valeurs
+    creator.create("FitnessInd", base.Fitness, weights=(1,))
+    creator.create("FitnessGroup", base.Fitness, weights=(1,))
+    # Individu creation
+    creator.create("Individual", ind.Ind, fitness_ind=creator.FitnessInd, fitness_group=creator.FitnessGroup)
+
+
   # Constructor
   def __init__(self, lines):
     current_time = datetime.now().strftime("%d-%m-%Y_%Hh.%Mm.%Ss")
@@ -52,17 +61,10 @@ class Puzzle(object):
     print "Personal Path used for this Puzzle: %s" % self.personal_path
 
     self.completion = 0.0 # current puzzle completion in percentage
-
-    self.toolbox = base.Toolbox()
-    # Creation des deux valeurs
-    creator.create("FitnessInd", base.Fitness, weights=(1,))
-    creator.create("FitnessGroup", base.Fitness, weights=(1,))
-    # Individu creation
-    creator.create("Individual", ind.Ind, fitness_ind=creator.FitnessInd, fitness_group=creator.FitnessGroup)
-
     # Pseudo random. put corners at corners and border at border
     arr = list(self.randomize_lines(*lines))
-
+    Puzzle.dynamique_type()
+    self.toolbox = base.Toolbox()
     self.toolbox.register("new_individual", creator.Individual, self._get_line_, arr)
     self.toolbox.register("desk", tools.initRepeat, list, self.toolbox.new_individual)
     self.population = self.toolbox.desk(n=len(arr))
@@ -88,10 +90,8 @@ class Puzzle(object):
     You can do that once you finished the main loop
     :return:
     """
-    self.stats.write_logbook()
-    self.stats.write_logbook(bin=True)
+    self.stats.write()
   # End Stats Function
-
 
   def mutate_position(self, index, list_positions):
     """

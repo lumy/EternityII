@@ -3,3 +3,4 @@ deap
 matplotlib
 dill
 pygame # Drawing the scene without java
+progressbar
