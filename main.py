@@ -43,7 +43,7 @@ def save_population(puzzle):
 
 def one_turn(puzzle, generation):
   # Example of call
-  removed_tils = puzzle.select()
+  removed_tils = puzzle.select(generation)
   # Example of call
   puzzle.crossover(removed_tils)
   # Example of call

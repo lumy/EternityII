@@ -22,9 +22,15 @@ border_pos = border_top_pos + border_bot_pos  + border_left_pos + border_right_p
 inside_pos = [x for x in range(0, total) if x not in corner_pos and x not in border_pos]
 
 score_group_max = 4 * total
-NGEN = 200
+NGEN = 2000
 
-
-mutate_inpd=0.4
+mutate_inpd=0.001
 selection_ind_value_step=1
-elitism_percentage=10
+elitism_percentage_start=10
+elitism_percentage_up=4
+gen_modulo_elitism=100
+
+# NGEN % gen_modulo_elitism : 2000 / 100 = 20
+# 20 * elitism_percentage_up : 20 * 4 = 80
+# 80 + elitism_percentage_start : 80 + 10 = 90
+# elitism_percentage_end = 90

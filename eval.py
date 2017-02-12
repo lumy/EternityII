@@ -129,3 +129,24 @@ def eval_solution(population):
   puzzle_completion = sum(individuals_score) * 100.0 / config.score_group_max
 
   return (individuals_score, individuals_cluster_score, puzzle_completion)
+
+def eval_individual_score(population, index):
+  individual = population[index]
+  x = index % config.size_line
+  y = index / config.size_line
+  individual_score = 0
+  eval_neighbors_matches = [
+    # [neighbor, individual_side, neighbor_side]
+    [get_individual_neighbor(population, index, x, y, NORTH), NORTH, SOUTH],
+    [get_individual_neighbor(population, index, x, y, EAST), EAST, WEST],
+    [get_individual_neighbor(population, index, x, y, SOUTH), SOUTH, NORTH],
+    [get_individual_neighbor(population, index, x, y, WEST), WEST, EAST]
+  ]
+  for eval_neighbor_match in eval_neighbors_matches:
+    neighbor = eval_neighbor_match[0][0]
+    individual_side = eval_neighbor_match[1]
+    neighbor_side = eval_neighbor_match[2]
+    # evaluate individual and neighbor corresponding sides
+    if neighbor == None or individual[individual_side] == neighbor[neighbor_side]:
+      individual_score += 1
+  return individual_score

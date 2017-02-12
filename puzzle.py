@@ -154,17 +154,25 @@ class Puzzle(object):
       individual.fitness_ind.values = individual_s,
       individual.fitness_group.values = cluster_s,
 
-  def select(self):
+  def select(self, generation):
     removed_tils = []
+    # Update elimism on generation modulo
+    if generation % config.gen_modulo_elitism == config.gen_modulo_elitism - 1 and config.elitism_percentage_start < 100:
+      config.elitism_percentage_start += config.elitism_percentage_up
     selection_ind_value = min(self.population, key=lambda k:k.fitness_group.values).fitness_group.values
     # Get nb tils to remove
-    nb_to_remove = int((100 - config.elitism_percentage) * float(config.total) / 100)
+    nb_to_remove = int((100 - config.elitism_percentage_start) * float(config.total) / 100)
+    # Create and randomize indexes list
+    indexes = list(range(1, config.total))
+    random.shuffle(indexes)
     # Select algorithm
     while nb_to_remove > 0:
-      for i, ind in enumerate(self.population):
-        if nb_to_remove > 0 and i > 0 and ind is not None and ind.fitness_group.values == selection_ind_value:
+      for i in indexes:
+        if nb_to_remove > 0 and i > 0 and \
+            self.population[i].fitness_ind.values != 4 and \
+            self.population[i].fitness_group.values == selection_ind_value:
+          removed_tils.append(self.population[i])
           self.population[i] = None
-          removed_tils.append(ind)
           nb_to_remove -= 1
       selection_ind_value = (selection_ind_value[0] + config.selection_ind_value_step,)
     return removed_tils
@@ -178,9 +186,7 @@ class Puzzle(object):
     random.shuffle(list_center)
     random.shuffle(list_border)
     random.shuffle(list_corner)
-    # Random rotation on center pils
-    for ind in list_center:
-      ind.rotates(random.randint(0, 4))
+    # Put individuals
     for i, ind in enumerate(self.population):
       if ind is None:
         if i in config.corner_pos:
@@ -188,7 +194,17 @@ class Puzzle(object):
         elif i in config.border_pos:
           self.population[i] = list_border.pop()
         else:
-          self.population[i] = list_center.pop(random.randrange(len(list_center)))
+          self.population[i] = list_center.pop()
+          # Check for best rotation
+          rotation = 0
+          fitness = eval.eval_individual_score(self.population, i)
+          for r in (range(1, 4)):
+            self.population[i].rotate()
+            if eval.eval_individual_score(self.population, i) > fitness:
+              fitness = eval.eval_individual_score(self.population, i)
+              rotation = r
+          for r in (range(0, rotation)):
+            self.population[i].rotate()
     # Applying rotation until it's the right side
     self.fixing_outside()
 
