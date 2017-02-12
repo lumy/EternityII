@@ -29,3 +29,8 @@ selection_ind_value_step=1
 elitism_percentage_start=10
 elitism_percentage_up=4
 gen_modulo_elitism=100
+
+# NGEN % gen_modulo_elitism : 2000 / 100 = 20
+# 20 * elitism_percentage_up : 20 * 4 = 80
+# 80 + elitism_percentage_start : 80 + 10 = 90
+# elitism_percentage_end = 90
