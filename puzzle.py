@@ -168,7 +168,7 @@ class Puzzle(object):
     # Select algorithm
     while nb_to_remove > 0:
       for i in indexes:
-        if nb_to_remove > 0 and i > 0 and \
+        if nb_to_remove > 0 and i > 0 and self.population[i] != None and \
             self.population[i].fitness_ind.values != 4 and \
             self.population[i].fitness_group.values == selection_ind_value:
           removed_tils.append(self.population[i])

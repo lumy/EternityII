@@ -11,6 +11,7 @@ WEST = 3
 virgin_score_list = []
 
 def init_virgin_scores_list():
+  del virgin_score_list[:]
   for index in range(0, config.total):
       virgin_score_list.append(None);
 

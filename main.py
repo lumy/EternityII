@@ -41,7 +41,7 @@ def save_population(puzzle):
     dill.dump(puzzle, f)
   print "Saved @%s" % config.population_file_saved
 
-def one_turn(puzzle, generation):
+def one_turn(puzzle, generation, write_stats):
   # Example of call
   removed_tils = puzzle.select(generation)
   # Example of call
@@ -50,13 +50,14 @@ def one_turn(puzzle, generation):
   n_mutated = puzzle.mutate()
   # Evaluate the entire population
   puzzle.evaluate()
-  # If you want log the different data
-  puzzle.log_stats(generation, n_mutated)
+  if write_stats:
+    # If you want log the different data
+    puzzle.log_stats(generation, n_mutated)
   if puzzle.population[0].fitness_group.values[0] == config.score_group_max:
     return True
   return False
 
-def _loop(puzzle):
+def _loop(puzzle, write_stats):
   """
     We Assume that the population is new an just setup and need to be eval first
   :param args:
@@ -64,26 +65,28 @@ def _loop(puzzle):
   :return:
   """
   for i in range(0, config.NGEN):
-    if one_turn(puzzle, i):
+    if one_turn(puzzle, i, write_stats):
       return True
   if i % 500 == 0 and i != 0:
     # Write the populations to a file to free some memory
     puzzle.stats.free_memory()
   return False
 
-def loop(puzzle):
-  s = _loop(puzzle)
+def loop(puzzle, write_stats):
+  s = _loop(puzzle, write_stats)
   if s:
     print "Solution Found !"
   else:
     print "No Solution Look at the logbook."
-  # Saving logbook
-  puzzle.write_stats()
-  # you may want to generate some graph
-  # We should not need that anymore since it's supposed to be the last population in the file.
-  #save_population(puzzle)
+  if write_stats:
+    # Saving logbook
+    puzzle.write_stats()
+    # you may want to generate some graph
+    # We should not need that anymore since it's supposed to be the last population in the file.
+    #save_population(puzzle)
+  # END LOOP
 
-def main(timed=False):
+def main(write_stats, timed=False):
   try:
     os.mkdir("./gen/")
   except Exception as e:
@@ -92,8 +95,8 @@ def main(timed=False):
   if timed:
     timed_loop.timed_loop(puzzle, one_turn)
   else:
-    loop(puzzle)
+    loop(puzzle, write_stats)
 
 if __name__ == '__main__':
   timed = False
-  main(timed=timed)
+  main(True, timed=timed)
