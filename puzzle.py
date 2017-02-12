@@ -146,7 +146,7 @@ class Puzzle(object):
   def select(self, generation):
     removed_tils = []
     # Update elimism on generation modulo
-    if generation % config.gen_modulo_elitism == config.gen_modulo_elitism - 1:
+    if generation % config.gen_modulo_elitism == config.gen_modulo_elitism - 1 and config.elitism_percentage_start != 100:
       config.elitism_percentage_start += config.elitism_percentage_up
     selection_ind_value = min(self.population, key=lambda k:k.fitness_group.values).fitness_group.values
     # Get nb tils to remove

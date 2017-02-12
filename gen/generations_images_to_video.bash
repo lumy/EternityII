@@ -43,6 +43,5 @@ cd "$1"
 create_symbolic_links
 
 ffmpeg -i "$SYM_LINKS_FORMAT.jpeg" "$OUTPUT_NAME"
-# ffmpeg -i "$SYM_LINKS_FORMAT.jpeg" -vcodec libx264 "$OUTPUT_NAME"
 
 delete_symbolic_links
