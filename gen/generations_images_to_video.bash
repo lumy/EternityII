@@ -12,6 +12,8 @@ function create_symbolic_links()
 	local -x symbolic_link=`printf "$SYM_LINKS_FORMAT%s" $index ".jpeg"`
 
 	ln -sf "$line" "$symbolic_link"
+  # cp -f "$line" "$symbolic_link"
+
 	index=$((index + 1))
     done <<< `ls -tr gen_*`
     IFS=$IFS_SAVE
@@ -41,5 +43,6 @@ cd "$1"
 create_symbolic_links
 
 ffmpeg -i "$SYM_LINKS_FORMAT.jpeg" "$OUTPUT_NAME"
+# ffmpeg -i "$SYM_LINKS_FORMAT.jpeg" -vcodec libx264 "$OUTPUT_NAME"
 
 delete_symbolic_links
