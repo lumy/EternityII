@@ -20,7 +20,7 @@
 
 ### configuration and population
 
-The config file config.py got alot of interesting setting:
+The config file config.py got a lot of interesting setting:
 
 ```python
 population_file_base="e2pieces.txt"
@@ -37,7 +37,7 @@ gen_modulo_elitism=100
 
 ### Workflows. Running Scripts
 
-  The workflow start by running the script called main then the script render
+  The workflow starts by running the script called main then the script render
 
   ```bash
   $ python main.py
@@ -54,7 +54,7 @@ gen_modulo_elitism=100
   (the package we use seems to work peferclty under all unix/linux but seems
   still in dev for windows and others).
 
-  If you want benchmark our algorithm you can simply laucnch algo_benchmark.py as:
+  If you want benchmark our algorithm you can simply launch algo_benchmark.py as:
 
   ```bash
   $ python algo_benchmark.py
