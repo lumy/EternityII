@@ -67,9 +67,9 @@ def _loop(puzzle, write_stats):
   for i in range(0, config.NGEN):
     if one_turn(puzzle, i, write_stats):
       return True
-  if i % 500 == 0 and i != 0:
-    # Write the populations to a file to free some memory
-    puzzle.stats.free_memory()
+    if i % 500 == 0 and i != 0:
+      # Write the populations to a file to free some memory
+      puzzle.stats.free_memory()
   return False
 
 def loop(puzzle, write_stats):
