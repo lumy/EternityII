@@ -177,7 +177,84 @@ class Puzzle(object):
       selection_ind_value = (selection_ind_value[0] + config.selection_ind_value_step,)
     return removed_tils
 
+  def get_mask(self, index):
+    """
+      return the Mask for a given index
+    :param index: int index of population
+    :return:
+    """
+    def _get_mask(dir, ldir):
+      n, n_i = eval.get_individual_neighbor(self.population, index,
+                                            index % config.size_line, index / config.size_line, dir)
+      if n_i is None:
+        return 0
+      if n is None:
+        return None
+      return n[ldir]
+    # [n, e, s, w]
+    return [_get_mask(eval.NORTH, 2),_get_mask(eval.EAST, 3), _get_mask(eval.SOUTH, 0), _get_mask(eval.WEST, 1)]
+
+  def set_individual_best_mask(self, ind, pos, mask):
+    t = [ind._mask_(mask, c_index=0), ind._mask_(mask, c_index=1), ind._mask_(mask, c_index=2),
+         ind._mask_(mask, c_index=3)]
+    ind.rotates(t.index(max(t)))
+    if self.population[pos] != None:
+      raise IndexError("Can't set on a not None object")
+    self.population[pos] = ind
+
+  def roulette(self, elems, k):
+    """
+      Please have a look at https://github.com/DEAP/deap/blob/master/deap/tools/selection.py
+      It's cleary inspired of the function selRoulette.
+      Thanks to deap.
+    :param elems:
+    :param k:
+    :return:
+    """
+
+    s_inds = sorted(elems, reverse=True)
+    sum_fits = sum(elems)
+
+    chosen = []
+    for i in xrange(k):
+      u = random.random() * sum_fits
+      sum_ = 0
+      for i, ind in enumerate(s_inds):
+        sum_ += ind
+        if sum_ > u:
+          chosen.append(i)
+          break
+    return chosen
+
+  def place_type(self, list_type, pos_type):
+    """
+        - get X positions valuable for now and put it at a random one.
+        - Look for new free conncted position to add to the typelist
+        - Place the next til
+    :param list_type:
+    :param pos_type:
+    :return:
+    """
+    if len(list_type) == 0:
+      return
+    free_pos_type = [x for x in pos_type if  self.population[x] == None]
+    mask_list = [self.get_mask(x) for x in free_pos_type]
+    for pos in list_type:
+      val_free_pos = [pos.best_value_of_mask(mask) for mask in mask_list]
+      new_pos = self.roulette(val_free_pos, 1)[0]
+      self.set_individual_best_mask(pos, free_pos_type.pop(new_pos), mask_list.pop(new_pos))
+
   def crossover(self, removed_tils):
+    """
+      - We shall first sort the removed_tils by type of tils (list_corner/border/center)
+      - then we should look for every available connected position for a given type.
+      - We should shuffle our lists
+      - for each type of tils
+        - get X positions valuable for now and put it at a random one.
+        - Look for new free conncted position to add to the typelist
+    :param removed_tils:
+    :return:
+    """
     # Get corners, borders and centers tils in removed_tils
     list_corner = [ind for ind in removed_tils if ind.count(0) == 2]
     list_border = [ind for ind in removed_tils if ind.count(0) == 1]
@@ -186,26 +263,12 @@ class Puzzle(object):
     random.shuffle(list_center)
     random.shuffle(list_border)
     random.shuffle(list_corner)
-    # Put individuals
-    for i, ind in enumerate(self.population):
-      if ind is None:
-        if i in config.corner_pos:
-          self.population[i] = list_corner.pop()
-        elif i in config.border_pos:
-          self.population[i] = list_border.pop()
-        else:
-          self.population[i] = list_center.pop()
-          # Check for best rotation
-          rotation = 0
-          fitness = eval.eval_individual_score(self.population, i)
-          for r in (range(1, 4)):
-            self.population[i].rotate()
-            if eval.eval_individual_score(self.population, i) > fitness:
-              fitness = eval.eval_individual_score(self.population, i)
-              rotation = r
-          for r in (range(0, rotation)):
-            self.population[i].rotate()
-    # Applying rotation until it's the right side
+    # Placing every ind
+    self.place_type(list_corner, config.corner_pos)
+    self.place_type(list_border, config.border_pos)
+    self.place_type(list_center, config.inside_pos)
+
+    # In case of but we shouldn't need that.
     self.fixing_outside()
 
   #####################
