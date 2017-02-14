@@ -76,7 +76,7 @@ def loop(puzzle, write_stats, nloop=None, timer=None):
   if timer:
     end_time = time.time() + datetime.timedelta(minutes=timer).total_seconds()
 
-  while iteration < nloop and (end_time is None or time.time() < end_time):
+  while (nloop == -1 or iteration < nloop) and (end_time is None or time.time() < end_time):
 
     if one_turn(puzzle, iteration, write_stats):
       print "Solution Found !"
@@ -112,7 +112,7 @@ def get_args():
   """
   parser = argparse.ArgumentParser(description=help)
   parser.add_argument('--loop', '-l', action='store', default=config.NGEN,
-                      help='Number of loop maximum to do. (default: config.NGEN %s)' % config.NGEN)
+                      help='Number of loop maximum to do. if set to -1 infinite loop (use time to stop) (default: config.NGEN %s)' % config.NGEN)
   parser.add_argument('--time', '-t', action='store', default=None,
                       help='Maximum time to execute the loop in min')
   parser.add_argument('--timed', action='store_true', default=False,
