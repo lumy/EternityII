@@ -240,7 +240,7 @@ class Puzzle(object):
     free_pos_type = [x for x in pos_type if  self.population[x] == None]
     mask_list = [self.get_mask(x) for x in free_pos_type]
     for pos in list_type:
-      val_free_pos = [pos.best_value_of_mask(mask) for mask in mask_list]
+      val_free_pos = [1 + pos.best_value_of_mask(mask) for mask in mask_list]
       new_pos = self.roulette(val_free_pos, 1)[0]
       self.set_individual_best_mask(pos, free_pos_type.pop(new_pos), mask_list.pop(new_pos))
 
