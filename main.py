@@ -6,10 +6,9 @@ import time
 import datetime
 
 import timed_loop
-import dill as dill
-
+import dill
 import ind
-from puzzle import Puzzle
+import puzzle
 
 # WINDOWS TROUBLE ><
 os.environ['TCL_LIBRARY'] = "C:\\Python27\\tcl\\tcl8.5"
@@ -19,29 +18,35 @@ import config
 
 def _load_file(s):
   try:
-    with open(s, "r") as e:
+    with open(s, "rb") as e:
+      puzzle.Puzzle.dynamique_type()
       return dill.load(e)
   except Exception as e:
+    print "Exception while loading file %s" % s
     print e
     return None
 
-def load_population(old_pop):
-  if old_pop:
-    f = _load_file(config.population_file_saved)
-    if f != None: # Todo Save a basic population and reload it in the Puzzle
-      print "Old Population Loaded"
-      return f
+def load_population():
+
+  f = _load_file(config.population_file_saved)
+  if f != None:
+    return f
 
   # Loading a basic Population with a runner
   inds = ind.get_population()
   corner = [i for i in inds if i[1].count(0) == 2]
   border = [i for i in inds if i[1].count(0) == 1]
   inside = [i for i in inds if i[1].count(0) == 0]
-  return Puzzle((corner, border, inside))
+  return puzzle.Puzzle((corner, border, inside))
 
 
 def save_population(puzzle):
-  with open(config.population_file_saved, "w") as f:
+  """
+  Should we be using personal path ?
+  :param puzzle:
+  :return:
+  """
+  with open(config.population_file_saved, "wb") as f:
     dill.dump(puzzle, f)
   print "Saved @%s" % config.population_file_saved
 
@@ -91,9 +96,9 @@ def loop(puzzle, write_stats, nloop=None, timer=None):
 
   print "No Solution Look at the logbook."
   if write_stats:
-    # Saving logbook
     puzzle.write_stats()
     save_population(puzzle)
+
 
 def main(write_stats, old_pop=False, timer=None, nloop=None, timed=False):
   try:
