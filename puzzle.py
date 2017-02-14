@@ -135,7 +135,7 @@ class Puzzle(object):
     :return:
     """
     # individuals, individual's clusters, and puzzle completion evaluations
-    individuals_s, individuals_clusters_s, puzzle_completion = eval.eval_solution(self.population)
+    individuals_s, individuals_clusters_s, puzzle_completion, connections_completion, nb_individuals_per_ind_score = eval.eval_solution(self.population)
 
     # print "individuals evaluation:"
     # for index in range(0, 16):
