@@ -34,22 +34,39 @@ class Ind(object):
   def __setitem__(self, key, value):
     self.content[key] = value
 
-  def mask(self, mask):
+  def best_value_of_mask(self, mask):
     """
-      return True if the mask is ok with the content
-    :param mask: list of None and 0
+
+    :param mask:
     :return:
     """
-    def _mask(m, c):
+    t = [self._mask_(mask, c_index=0), self._mask_(mask, c_index=1), self._mask_(mask, c_index=2),
+         self._mask_(mask, c_index=3)]
+    # Return value between 0 and 4 that represant individual connection/score
+    return t[t.index(max(t))]
+
+  def _mask_(self, mask, c_index=0):
+    """
+          return True if the mask is ok with the content
+        :param mask: list of None and 0
+        :return:
+        """
+    def _mask(m, index, c):
       if c < 4:
-        if m[c] == None:
-          return _mask(m, c + 1)
-        if m[c] == self.content[c]:
-          return _mask(m, c + 1)
+        if index >= 4:
+          index = 0
+        if m[c] == None or m[c] == self.content[index]:
+          return 1 + _mask(m, index + 1, c + 1)
         else:
-          return False
+          return 0 + _mask(m, index + 1, c + 1)
+      return 0
+
+    return _mask(mask, c_index, 0)
+
+  def mask(self, mask, c_index=0):
+    if 4 == self._mask_(mask, c_index=c_index):
       return True
-    return _mask(mask, 0)
+    return False
 
   def count(self, obj):
     """
