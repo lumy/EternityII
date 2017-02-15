@@ -43,8 +43,11 @@ def save_population(puzzle):
 
 def one_turn(puzzle, generation, write_stats):
   # Example of call
-  removed_tils = puzzle.select(generation)
+  average = puzzle.stats.logbook.chapters["group_fitness"].select("avg")[-1]
+  average2 = puzzle.stats.logbook.chapters["individual_fitness"].select("avg")[-1]
+  removed_tils = puzzle.select(generation, average_ind_value=average2, average_group_value=average)
   # Example of call
+  rm_tils = len(removed_tils)
   puzzle.crossover(removed_tils)
   # Example of call
   n_mutated = puzzle.mutate()
@@ -52,7 +55,7 @@ def one_turn(puzzle, generation, write_stats):
   puzzle.evaluate()
   if write_stats:
     # If you want log the different data
-    puzzle.log_stats(generation, n_mutated)
+    puzzle.log_stats(generation, rm_tils, n_mutated)
   if puzzle.population[0].fitness_group.values[0] == config.score_group_max:
     return True
   return False
