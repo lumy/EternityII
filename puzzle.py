@@ -73,17 +73,17 @@ class Puzzle(object):
     # Init the stats we want to log
     self.stats = stats.Stats(self.personal_path)
     self.evaluate()
-    self.log_stats(-1, 0)
+    self.log_stats(-1, 0, 0)
 
   # Stats Function
-  def log_stats(self, generation, n_mutated):
+  def log_stats(self, generation, rm_tils, n_mutated):
     """
     Do that at each iteration.
     :param generation:
     :param n_mutated:
     :return:
     """
-    self.stats.log_stats(generation, copy.deepcopy(self.population), n_mutated, self.completion)
+    self.stats.log_stats(generation, copy.deepcopy(self.population), rm_tils, n_mutated, self.completion)
 
   def write_stats(self):
     """
@@ -154,27 +154,38 @@ class Puzzle(object):
       individual.fitness_ind.values = individual_s,
       individual.fitness_group.values = cluster_s,
 
-  def select(self, generation):
+  def select(self, generation, average_ind_value=0.5, average_group_value=0.5):
+    """
+      Remove all connection < 4 and group_value < average_group_value
+    :param generation:
+    :param average_ind_value:
+    :param average_group_value:
+    :return:
+    """
     removed_tils = []
     # Update elimism on generation modulo
-    if generation % config.gen_modulo_elitism == config.gen_modulo_elitism - 1 and config.elitism_percentage_start < 100:
-      config.elitism_percentage_start += config.elitism_percentage_up
-    selection_ind_value = min(self.population, key=lambda k:k.fitness_group.values).fitness_group.values
+    # selection_ind_value = min(self.population, key=lambda k:k.fitness_group.values).fitness_group.values
     # Get nb tils to remove
-    nb_to_remove = int((100 - config.elitism_percentage_start) * float(config.total) / 100)
-    # Create and randomize indexes list
-    indexes = list(range(1, config.total))
-    random.shuffle(indexes)
-    # Select algorithm
-    while nb_to_remove > 0:
-      for i in indexes:
-        if nb_to_remove > 0 and i > 0 and self.population[i] != None and \
-            self.population[i].fitness_ind.values != 4 and \
-            self.population[i].fitness_group.values == selection_ind_value:
-          removed_tils.append(self.population[i])
-          self.population[i] = None
-          nb_to_remove -= 1
-      selection_ind_value = (selection_ind_value[0] + config.selection_ind_value_step,)
+    for ind in self.population[1:]:
+      if ind != None and (ind.fitness_group.values[0] <= average_group_value and ind.fitness_ind.values[0] < 4):
+        index = self.population.index(ind)
+        removed_tils.append(self.population[index])
+        self.population[index] = None
+
+    # # Create and randomize indexes list
+    # indexes = list(range(1, config.total))
+    # random.shuffle(indexes)
+    # # Select algorithm
+    # while nb_to_remove > 0:
+    #   for i in indexes:
+    #     if nb_to_remove > 0 and i > 0 and self.population[i] != None and \
+    #         self.population[i].fitness_ind.values != 4 and \
+    #         self.population[i].fitness_group.values == selection_ind_value:
+    #       removed_tils.append(self.population[i])
+    #       self.population[i] = None
+    #       nb_to_remove -= 1
+    #   selection_ind_value = (selection_ind_value[0] + config.selection_ind_value_step,)
+
     return removed_tils
 
   def get_mask(self, index):
