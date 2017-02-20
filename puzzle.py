@@ -83,7 +83,7 @@ class Puzzle(object):
     :param n_mutated:
     :return:
     """
-    self.stats.log_stats(generation, copy.deepcopy(self.population), n_mutated, self.completion)
+    self.stats.log_stats(generation, copy.deepcopy(self.population), n_mutated, (self.connections_completions, self.completion))
 
   def write_stats(self):
     """
@@ -148,7 +148,7 @@ class Puzzle(object):
     # print
 
     # print "puzzle completion:", puzzle_completion, "%\n"
-
+    self.connections_completions = connections_completion
     self.completion = puzzle_completion
     for individual, individual_s, cluster_s in zip(self.population, individuals_s, individuals_clusters_s):
       individual.fitness_ind.values = individual_s,
