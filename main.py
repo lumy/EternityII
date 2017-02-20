@@ -48,9 +48,9 @@ def save_population(puzzle):
 
 def one_turn(puzzle, generation, write_stats):
   # Example of call
-  average = puzzle.stats.logbook.chapters["group_fitness"].select("avg")[-1]
-  average2 = puzzle.stats.logbook.chapters["individual_fitness"].select("avg")[-1]
-  removed_tils = puzzle.select(generation, average_ind_value=average2, average_group_value=average)
+  last_con = puzzle.stats.logbook.select("connections_completions")[-1]
+  last_score = puzzle.stats.logbook.select("score")[-1]
+  removed_tils = puzzle.select(generation, last_con, last_score)
   # Example of call
   rm_tils = len(removed_tils)
   puzzle.crossover(removed_tils)
