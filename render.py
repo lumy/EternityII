@@ -5,10 +5,10 @@ import sys
 def init(g):
   puzzle.Puzzle.dynamique_type()
   stats = open_logboox(g)
-  stats.draw_all_eternity()
   stats.generate_stats_generations(ftype="avg")
   stats.generate_stats_generations(ftype="min")
   stats.generate_stats_generations(ftype="max")
+  stats.draw_all_eternity()
   stats.generate_graph_per_generations(saved=True, show=False)
 
 if __name__ == '__main__':
