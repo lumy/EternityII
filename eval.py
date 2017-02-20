@@ -127,9 +127,14 @@ def eval_solution(population):
 
   for index in range(0, len(population)):
     eval_individual(population, index, individuals_score, individuals_cluster_score)
-  puzzle_completion = sum(individuals_score) * 100.0 / config.score_group_max
+  connections_completion = sum(individuals_score) * 100.0 / config.score_group_max
 
-  return (individuals_score, individuals_cluster_score, puzzle_completion)
+  nb_individuals_per_ind_score = [0, 0, 0, 0, 0] # index=0 -> nb score at 0; index=1 -> nb score at 1; etc
+  for individual_score in individuals_score:
+      nb_individuals_per_ind_score[individual_score] += 1
+  puzzle_completion = nb_individuals_per_ind_score[4] * 100.0 / config.total
+
+  return (individuals_score, individuals_cluster_score, puzzle_completion, connections_completion, nb_individuals_per_ind_score)
 
 def eval_individual_score(population, index):
   individual = population[index]
