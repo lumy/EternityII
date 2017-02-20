@@ -26,11 +26,11 @@ def _load_file(s):
     print e
     return None
 
-def load_population():
-
-  f = _load_file(config.population_file_saved)
-  if f != None:
-    return f
+def load_population(old_pop=False):
+  if old_pop:
+    f = _load_file(config.population_file_saved)
+    if f != None:
+      return f
 
   # Loading a basic Population with a runner
   inds = ind.get_population()
