@@ -27,11 +27,11 @@ class Stats(object):
     self.logbook = tools.Logbook()
     self.populations = []
     # Use when Wrote to file or printed to screen
-    self.logbook.header = "generations", "score", "selected_tils", "mutation_percent", "mutated", "individual_fitness", "group_fitness"
+    self.logbook.header = "generations", "nb_full_connected", "connections_completions", "score", "mutation_percent", "mutated", "individual_fitness", "group_fitness"
     self.logbook.chapters['individual_fitness'].header = "min", "avg", "max"
     self.logbook.chapters['group_fitness'].header = "min", "avg", "max"
 
-  def log_stats(self, generation, population, rm_tils, n_mutated, score):
+  def log_stats(self, generation, population, n_mutated, scores):
     """
       Stats to be logged:
         Generation : Represant the iteration you're on
@@ -49,8 +49,9 @@ class Stats(object):
     """
     record = self.stats.compile(population)
     self.populations.append(population)
-    self.logbook.record(generations=generation, selected_tils=rm_tils, mutated=n_mutated, mutation_percent=config.mutate_inpd,
-                        score=score, **record)
+    self.logbook.record(generations=generation, mutated=n_mutated, mutation_percent=config.mutate_inpd,
+                        nb_full_connected=len([x for x in population if x.fitness_ind.values[0] == 4]),
+                        connections_completions=scores[0], score=scores[1], **record)
     # I case we need to keep famous big scores.
     # self.famous.update(self.pop)
 

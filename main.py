@@ -29,7 +29,6 @@ def load_population(old_pop=False):
     if f != None:
       return f
 
-  # Loading a basic Population with a runner
   inds = ind.get_population()
   corner = [i for i in inds if i[1].count(0) == 2]
   border = [i for i in inds if i[1].count(0) == 1]
