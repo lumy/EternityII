@@ -161,33 +161,29 @@ class Puzzle(object):
     :param average_ind_value:
     :param average_group_value:
     :return:
-    """
+    """    
+    keep_tils = []
+
+    def _select_(root, current):
+      keep_tils.append(current)
+      x,y = current % config.size_line, current / config.size_line
+      neighbors = [ (eval.get_individual_neighbor(self.population, current, x, y, eval.NORTH), eval.NORTH, eval.SOUTH),
+                    (eval.get_individual_neighbor(self.population, current, x, y, eval.EAST), eval.EAST, eval.WEST),
+                    (eval.get_individual_neighbor(self.population, current, x, y, eval.SOUTH), eval.SOUTH, eval.NORTH),
+                    (eval.get_individual_neighbor(self.population, current, x, y, eval.WEST), eval.WEST, eval.EAST)]
+      for neighs, ind_side, neigh_side in neighbors:
+        neigh, n_index = neighs
+        if neigh is not None and n_index not in keep_tils and \
+          self.population[current][ind_side] == neigh[neigh_side]:
+          _select_(root, n_index)
+    
+    _select_(0, 0)
     removed_tils = []
-    # Update elimism on generation modulo
-    # selection_ind_value = min(self.population, key=lambda k:k.fitness_group.values).fitness_group.values
-    # Get nb tils to remove
-    for ind in self.population[1:]:
-      if ind != None and (ind.fitness_group.values[0] <= average_group_value and ind.fitness_ind.values[0] < 4):
-        index = self.population.index(ind)
-        removed_tils.append(self.population[index])
-        self.population[index] = None
-
-    # # Create and randomize indexes list
-    # indexes = list(range(1, config.total))
-    # random.shuffle(indexes)
-    # # Select algorithm
-    # while nb_to_remove > 0:
-    #   for i in indexes:
-    #     if nb_to_remove > 0 and i > 0 and self.population[i] != None and \
-    #         self.population[i].fitness_ind.values != 4 and \
-    #         self.population[i].fitness_group.values == selection_ind_value:
-    #       removed_tils.append(self.population[i])
-    #       self.population[i] = None
-    #       nb_to_remove -= 1
-    #   selection_ind_value = (selection_ind_value[0] + config.selection_ind_value_step,)
-
+    for index in [i for i in range(0, config.total) if i not in keep_tils]:
+      removed_tils.append(self.population[index])
+      self.population[index] = None
     return removed_tils
-
+    
   def get_mask(self, index):
     """
       return the Mask for a given index
@@ -251,6 +247,7 @@ class Puzzle(object):
     free_pos_type = [x for x in pos_type if  self.population[x] == None]
     mask_list = [self.get_mask(x) for x in free_pos_type]
     for pos in list_type:
+      # Setting + 1 in the loop, because roulette function doesn't take value 0.
       val_free_pos = [1 + pos.best_value_of_mask(mask) for mask in mask_list]
       new_pos = self.roulette(val_free_pos, 1)[0]
       self.set_individual_best_mask(pos, free_pos_type.pop(new_pos), mask_list.pop(new_pos))
