@@ -72,6 +72,8 @@ class Puzzle(object):
     self.fixing_outside()
     # Init the stats we want to log
     self.stats = stats.Stats(self.personal_path)
+    self.connections_completions = 0.0
+    self.completion = 0.0
     self.evaluate()
     self.log_stats(-1, 0, 0)
 
@@ -83,7 +85,7 @@ class Puzzle(object):
     :param n_mutated:
     :return:
     """
-    self.stats.log_stats(generation, copy.deepcopy(self.population), n_mutated, (self.connections_completions, self.completion))
+    self.stats.log_stats(generation, copy.deepcopy(self.population), rm_tils, n_mutated, (self.connections_completions, self.completion))
 
     
   def write_stats(self):
@@ -155,36 +157,53 @@ class Puzzle(object):
       individual.fitness_ind.values = individual_s,
       individual.fitness_group.values = cluster_s,
 
-  def select(self, generation, average_ind_value=0.5, average_group_value=0.5):
+  def select(self, generation, con_complt, score):
     """
       Remove all connection < 4 and group_value < average_group_value
     :param generation:
     :param average_ind_value:
     :param average_group_value:
     :return:
-    """    
+    """
     keep_tils = []
-
-    def _select_(root, current):
-      keep_tils.append(current)
+    def _get_neighs(current):
       x,y = current % config.size_line, current / config.size_line
-      neighbors = [ (eval.get_individual_neighbor(self.population, current, x, y, eval.NORTH), eval.NORTH, eval.SOUTH),
-                    (eval.get_individual_neighbor(self.population, current, x, y, eval.EAST), eval.EAST, eval.WEST),
-                    (eval.get_individual_neighbor(self.population, current, x, y, eval.SOUTH), eval.SOUTH, eval.NORTH),
-                    (eval.get_individual_neighbor(self.population, current, x, y, eval.WEST), eval.WEST, eval.EAST)]
+      return ((eval.get_individual_neighbor(self.population, current, x, y, eval.NORTH), eval.NORTH, eval.SOUTH),
+              (eval.get_individual_neighbor(self.population, current, x, y, eval.EAST), eval.EAST, eval.WEST),
+              (eval.get_individual_neighbor(self.population, current, x, y, eval.SOUTH), eval.SOUTH, eval.NORTH),
+              (eval.get_individual_neighbor(self.population, current, x, y, eval.WEST), eval.WEST, eval.EAST))
+ 
+    def _select_ligth_(root, current):
+      keep_tils.append(current)
+      neighbors = _get_neighs(current)
       for neighs, ind_side, neigh_side in neighbors:
         neigh, n_index = neighs
         if neigh is not None and n_index not in keep_tils and \
           self.population[current][ind_side] == neigh[neigh_side]:
-          _select_(root, n_index)
-    
-    _select_(0, 0)
+          _select_ligth_(root, n_index)
+
+    def _select_heavy_(root, current, heavy):
+      keep_tils.append(current)
+      neighbors = _get_neighs(current)
+      for neighs, ind_side, neigh_side in neighbors:
+        neigh, n_index = neighs
+        if neigh is not None and n_index not in keep_tils and \
+          neigh.fitness_ind.values[0] >= heavy:
+          _select_heavy_(root, n_index, heavy)
+
+    diff = con_complt - score
+    if  diff < config.select_light:
+      _select_ligth_(0, 0)
+    elif config.select_light <= diff <= config.select_medium:
+      _select_heavy_(0, 0, 3)
+    else:
+      _select_heavy_(0, 0, 4)
     removed_tils = []
     for index in [i for i in range(0, config.total) if i not in keep_tils]:
       removed_tils.append(self.population[index])
       self.population[index] = None
     return removed_tils
-    
+
   def get_mask(self, index):
     """
       return the Mask for a given index
