@@ -77,7 +77,6 @@ gen_modulo_elitism=100
 
   launching benchmark...
   [Error 183] Cannot create a file when that file already exists: './gen/'
-  ord() expected a character, but string of length 0 found
   Personal Path used for this Puzzle: gen/lumy_13-02-2017_13h.36m.53s/
   No Solution Look at the logbook.
   0 	| test_4pieces.txt 	| resolution time: 0:00:16.057000
