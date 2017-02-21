@@ -5,6 +5,10 @@
 
   some research have been made have a look at our gdoc (link is coming)
 
+  [our_algorithm]
+
+  [other link]
+
 ## Setup
 
 ### requirements
@@ -32,29 +36,41 @@ elitism_percentage_up=4
 gen_modulo_elitism=100
 ```
 
-- population_file_base:
-- NGEN:
+- population_file_base: filename containing the tils to play with.
+  - Few file have been wrote alyready `test_4pieces.txt` `test_9pieces.txt` `test_16pieces.txt`
+- NGEN: Number of default iteration to do. See [our_algorithm#iteration]
+- mutate_inpd: Percentage of mutation. (between 0 and 1)
 
 ### Workflows. Running Scripts
 
-  The workflow starts by running the script called main then the script render
+
+#### The workflow starts by running the script called main then the script render
 
   ```bash
   $ python main.py
   [Error 183] Cannot create a file when that file already exists: './gen/'
   Personal Path used for this Puzzle: gen/lumy_13-02-2017_13h.14m.46s/
   No Solution Look at the logbook.
+  ```
+
+#### Look at the path given for your puzzle. All the stats will be looged there.
+
+  ``` bash
   $ python render.py gen/lumy_13-02-2017_13h.14m.46s/
   (it take few time before an ouput arrive because it's loading big binary file).
   progression Bar 1 #################
   progression Bar 2 ########________#
-  $ ./gen/generations_images_to_video.bash gen/lumy_13-02-2017_13h.14m.46s/ # Only linux
   ```
   > If you do not see any progressbar it might be because you're not in a real tty
-  (the package we use seems to work peferclty under all unix/linux but seems
+  (the package we use seems to work perfectly under all unix/linux but seems
   still in dev for windows and others).
 
-  If you want benchmark our algorithm you can simply launch algo_benchmark.py as:
+#### Generate video if you have ffmpeg.
+  ``` bash
+  $ ./gen/generations_images_to_video.bash gen/lumy_13-02-2017_13h.14m.46s/
+  ```
+
+#### benchmark our algorithm you can simply launch algo_benchmark.py as:
 
   ```bash
   $ python algo_benchmark.py
