@@ -36,15 +36,15 @@ gen_modulo_elitism=100
 
 - population_file_base: filename containing the tils to play with.
   - Few file have been wrote alyready `test_4pieces.txt` `test_9pieces.txt` `test_16pieces.txt`
-- NGEN: Number of default iteration to do. See   [iteration](doc/Algorithm.md#iteration)
-- mutate_inpd: Percentage of mutation. (between 0 and 1)
+- NGEN: Number of default iteration to do. See [iteration](doc/Algorithm.md#iteration)
+- mutate_inpd: Percentage of mutation. (between 0 and 1) See [iteration](doc/Algorithm.md#mutation)
 
 ### Workflows. Running Scripts
 
 
 #### The workflow starts by running the script called main then the script render
 
-  ```bash
+  ```text
   $ python main.py
   [Error 183] Cannot create a file when that file already exists: './gen/'
   Personal Path used for this Puzzle: gen/lumy_13-02-2017_13h.14m.46s/
@@ -53,7 +53,7 @@ gen_modulo_elitism=100
 
 #### Look at the path given for your puzzle. All the stats will be looged there.
 
-  ``` bash
+  ``` text
   $ python render.py gen/lumy_13-02-2017_13h.14m.46s/
   (it take few time before an ouput arrive because it's loading big binary file).
   progression Bar 1 #################
@@ -64,13 +64,13 @@ gen_modulo_elitism=100
   still in dev for windows and others).
 
 #### Generate video if you have ffmpeg.
-  ``` bash
+  ``` text
   $ ./gen/generations_images_to_video.bash gen/lumy_13-02-2017_13h.14m.46s/
   ```
 
 #### benchmark our algorithm you can simply launch algo_benchmark.py as:
 
-  ```bash
+  ```text
   $ python algo_benchmark.py
   nb_parallel_executions 1
   nb_executions_per_grid_size 4
