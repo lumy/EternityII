@@ -5,9 +5,7 @@
 
   some research have been made have a look at our gdoc (link is coming)
 
-  [our_algorithm]
-
-  [other link]
+  [Current Algorithm](doc/Algorithm.md)
 
 ## Setup
 
@@ -38,7 +36,7 @@ gen_modulo_elitism=100
 
 - population_file_base: filename containing the tils to play with.
   - Few file have been wrote alyready `test_4pieces.txt` `test_9pieces.txt` `test_16pieces.txt`
-- NGEN: Number of default iteration to do. See [our_algorithm#iteration]
+- NGEN: Number of default iteration to do. See   [iteration](doc/Algorithm.md#iteration)
 - mutate_inpd: Percentage of mutation. (between 0 and 1)
 
 ### Workflows. Running Scripts
@@ -138,4 +136,6 @@ You can easily draw or save a Puzzle:
  $ eternity.save(puzzle, gen=0)
  $ eternity.save(puzzle, gen=1)
  ```
+
+
 
