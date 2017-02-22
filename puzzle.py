@@ -72,19 +72,22 @@ class Puzzle(object):
     self.fixing_outside()
     # Init the stats we want to log
     self.stats = stats.Stats(self.personal_path)
+    self.connections_completions = 0.0
+    self.completion = 0.0
     self.evaluate()
-    self.log_stats(-1, 0)
+    self.log_stats(-1, 0, 0)
 
   # Stats Function
-  def log_stats(self, generation, n_mutated):
+  def log_stats(self, generation, rm_tils, n_mutated):
     """
     Do that at each iteration.
     :param generation:
     :param n_mutated:
     :return:
     """
-    self.stats.log_stats(generation, copy.deepcopy(self.population), n_mutated, self.completion)
+    self.stats.log_stats(generation, copy.deepcopy(self.population), rm_tils, n_mutated, (self.connections_completions, self.completion))
 
+    
   def write_stats(self):
     """
     You can do that once you finished the main loop
@@ -148,36 +151,138 @@ class Puzzle(object):
     # print
 
     # print "puzzle completion:", puzzle_completion, "%\n"
-
+    self.connections_completions = connections_completion
     self.completion = puzzle_completion
     for individual, individual_s, cluster_s in zip(self.population, individuals_s, individuals_clusters_s):
       individual.fitness_ind.values = individual_s,
       individual.fitness_group.values = cluster_s,
 
-  def select(self, generation):
+  def select(self, generation, con_complt, score):
+    """
+      Remove all connection < 4 and group_value < average_group_value
+    :param generation:
+    :param average_ind_value:
+    :param average_group_value:
+    :return:
+    """
+    keep_tils = []
+    def _get_neighs(current):
+      x,y = current % config.size_line, current / config.size_line
+      return ((eval.get_individual_neighbor(self.population, current, x, y, eval.NORTH), eval.NORTH, eval.SOUTH),
+              (eval.get_individual_neighbor(self.population, current, x, y, eval.EAST), eval.EAST, eval.WEST),
+              (eval.get_individual_neighbor(self.population, current, x, y, eval.SOUTH), eval.SOUTH, eval.NORTH),
+              (eval.get_individual_neighbor(self.population, current, x, y, eval.WEST), eval.WEST, eval.EAST))
+ 
+    def _select_ligth_(root, current):
+      keep_tils.append(current)
+      neighbors = _get_neighs(current)
+      for neighs, ind_side, neigh_side in neighbors:
+        neigh, n_index = neighs
+        if neigh is not None and n_index not in keep_tils and \
+          self.population[current][ind_side] == neigh[neigh_side]:
+          _select_ligth_(root, n_index)
+
+    def _select_heavy_(root, current, heavy):
+      keep_tils.append(current)
+      neighbors = _get_neighs(current)
+      for neighs, ind_side, neigh_side in neighbors:
+        neigh, n_index = neighs
+        if neigh is not None and n_index not in keep_tils and \
+          neigh.fitness_ind.values[0] >= heavy:
+          _select_heavy_(root, n_index, heavy)
+
+    diff = con_complt - score
+    if  diff < config.select_light:
+      _select_ligth_(0, 0)
+    elif config.select_light <= diff <= config.select_medium:
+      _select_heavy_(0, 0, 3)
+    else:
+      _select_heavy_(0, 0, 4)
     removed_tils = []
-    # Update elimism on generation modulo
-    if generation % config.gen_modulo_elitism == config.gen_modulo_elitism - 1 and config.elitism_percentage_start < 100:
-      config.elitism_percentage_start += config.elitism_percentage_up
-    selection_ind_value = min(self.population, key=lambda k:k.fitness_group.values).fitness_group.values
-    # Get nb tils to remove
-    nb_to_remove = int((100 - config.elitism_percentage_start) * float(config.total) / 100)
-    # Create and randomize indexes list
-    indexes = list(range(1, config.total))
-    random.shuffle(indexes)
-    # Select algorithm
-    while nb_to_remove > 0:
-      for i in indexes:
-        if nb_to_remove > 0 and i > 0 and self.population[i] != None and \
-            self.population[i].fitness_ind.values != 4 and \
-            self.population[i].fitness_group.values == selection_ind_value:
-          removed_tils.append(self.population[i])
-          self.population[i] = None
-          nb_to_remove -= 1
-      selection_ind_value = (selection_ind_value[0] + config.selection_ind_value_step,)
+    for index in [i for i in range(0, config.total) if i not in keep_tils]:
+      removed_tils.append(self.population[index])
+      self.population[index] = None
     return removed_tils
 
+  def get_mask(self, index):
+    """
+      return the Mask for a given index
+    :param index: int index of population
+    :return:
+    """
+    def _get_mask(dir, ldir):
+      n, n_i = eval.get_individual_neighbor(self.population, index,
+                                            index % config.size_line, index / config.size_line, dir)
+      if n_i is None:
+        return 0
+      if n is None:
+        return None
+      return n[ldir]
+    # [n, e, s, w]
+    return [_get_mask(eval.NORTH, 2),_get_mask(eval.EAST, 3), _get_mask(eval.SOUTH, 0), _get_mask(eval.WEST, 1)]
+
+  def set_individual_best_mask(self, ind, pos, mask):
+    t = [ind._mask_(mask, c_index=0), ind._mask_(mask, c_index=1), ind._mask_(mask, c_index=2),
+         ind._mask_(mask, c_index=3)]
+    ind.rotates(t.index(max(t)))
+    if self.population[pos] != None:
+      raise IndexError("Can't set on a not None object")
+    self.population[pos] = ind
+
+  def roulette(self, elems, k):
+    """
+      Please have a look at https://github.com/DEAP/deap/blob/master/deap/tools/selection.py
+      It's cleary inspired of the function selRoulette.
+      Thanks to deap.
+    :param elems:
+    :param k:
+    :return:
+    """
+
+    s_inds = sorted(elems, reverse=True)
+    sum_fits = sum(elems)
+
+    chosen = []
+    for i in xrange(k):
+      u = random.random() * sum_fits
+      sum_ = 0
+      for i, ind in enumerate(s_inds):
+        sum_ += ind
+        if sum_ > u:
+          chosen.append(i)
+          break
+    return chosen
+
+  def place_type(self, list_type, pos_type):
+    """
+        - get X positions valuable for now and put it at a random one.
+        - Look for new free conncted position to add to the typelist
+        - Place the next til
+    :param list_type:
+    :param pos_type:
+    :return:
+    """
+    if len(list_type) == 0:
+      return
+    free_pos_type = [x for x in pos_type if  self.population[x] == None]
+    mask_list = [self.get_mask(x) for x in free_pos_type]
+    for pos in list_type:
+      # Setting + 1 in the loop, because roulette function doesn't take value 0.
+      val_free_pos = [1 + pos.best_value_of_mask(mask) for mask in mask_list]
+      new_pos = self.roulette(val_free_pos, 1)[0]
+      self.set_individual_best_mask(pos, free_pos_type.pop(new_pos), mask_list.pop(new_pos))
+
   def crossover(self, removed_tils):
+    """
+      - We shall first sort the removed_tils by type of tils (list_corner/border/center)
+      - then we should look for every available connected position for a given type.
+      - We should shuffle our lists
+      - for each type of tils
+        - get X positions valuable for now and put it at a random one.
+        - Look for new free conncted position to add to the typelist
+    :param removed_tils:
+    :return:
+    """
     # Get corners, borders and centers tils in removed_tils
     list_corner = [ind for ind in removed_tils if ind.count(0) == 2]
     list_border = [ind for ind in removed_tils if ind.count(0) == 1]
@@ -186,26 +291,12 @@ class Puzzle(object):
     random.shuffle(list_center)
     random.shuffle(list_border)
     random.shuffle(list_corner)
-    # Put individuals
-    for i, ind in enumerate(self.population):
-      if ind is None:
-        if i in config.corner_pos:
-          self.population[i] = list_corner.pop()
-        elif i in config.border_pos:
-          self.population[i] = list_border.pop()
-        else:
-          self.population[i] = list_center.pop()
-          # Check for best rotation
-          rotation = 0
-          fitness = eval.eval_individual_score(self.population, i)
-          for r in (range(1, 4)):
-            self.population[i].rotate()
-            if eval.eval_individual_score(self.population, i) > fitness:
-              fitness = eval.eval_individual_score(self.population, i)
-              rotation = r
-          for r in (range(0, rotation)):
-            self.population[i].rotate()
-    # Applying rotation until it's the right side
+    # Placing every ind
+    self.place_type(list_corner, config.corner_pos)
+    self.place_type(list_border, config.border_pos)
+    self.place_type(list_center, config.inside_pos)
+
+    # In case of but we shouldn't need that.
     self.fixing_outside()
 
   #####################

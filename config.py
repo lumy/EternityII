@@ -19,6 +19,11 @@ elitism_percentage_start=10
 elitism_percentage_up=4
 gen_modulo_elitism=100
 
+# diff = connection_completions - score
+select_light = 25.0
+select_medium = 70.0
+# select_heavy for other
+
 # values dynamically computed with init()
 initialized = False
 size_line = 0

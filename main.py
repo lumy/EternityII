@@ -1,10 +1,7 @@
 import argparse
 import os
-
 import time
-
 import datetime
-
 import timed_loop
 import dill
 import ind
@@ -26,13 +23,12 @@ def _load_file(s):
     print e
     return None
 
-def load_population():
+def load_population(old_pop=False):
+  if old_pop:
+    f = _load_file(config.population_file_saved)
+    if f != None:
+      return f
 
-  f = _load_file(config.population_file_saved)
-  if f != None:
-    return f
-
-  # Loading a basic Population with a runner
   inds = ind.get_population()
   corner = [i for i in inds if i[1].count(0) == 2]
   border = [i for i in inds if i[1].count(0) == 1]
@@ -52,8 +48,11 @@ def save_population(puzzle):
 
 def one_turn(puzzle, generation, write_stats):
   # Example of call
-  removed_tils = puzzle.select(generation)
+  last_con = puzzle.stats.logbook.select("connections_completions")[-1]
+  last_score = puzzle.stats.logbook.select("score")[-1]
+  removed_tils = puzzle.select(generation, last_con, last_score)
   # Example of call
+  rm_tils = len(removed_tils)
   puzzle.crossover(removed_tils)
   # Example of call
   n_mutated = puzzle.mutate()
@@ -61,7 +60,7 @@ def one_turn(puzzle, generation, write_stats):
   puzzle.evaluate()
   if write_stats:
     # If you want log the different data
-    puzzle.log_stats(generation, n_mutated)
+    puzzle.log_stats(generation, rm_tils, n_mutated)
   if puzzle.population[0].fitness_group.values[0] == config.score_group_max:
     return True
   return False
@@ -69,7 +68,6 @@ def one_turn(puzzle, generation, write_stats):
 
 def loop(puzzle, write_stats, nloop=None, timer=None):
   """
-
   :param puzzle:
   :param write_stats:
   :param nloop: argparse set nloop to config.ngen if not set.
@@ -80,7 +78,7 @@ def loop(puzzle, write_stats, nloop=None, timer=None):
   iteration = 0
   if timer:
     end_time = time.time() + datetime.timedelta(minutes=timer).total_seconds()
-
+  
   while (nloop == -1 or iteration < nloop) and (end_time is None or time.time() < end_time):
 
     if one_turn(puzzle, iteration, write_stats):
@@ -93,12 +91,10 @@ def loop(puzzle, write_stats, nloop=None, timer=None):
       # Write the populations to a file to free some memory
       puzzle.stats.free_memory()
     iteration += 1
-
   print "No Solution Look at the logbook."
   if write_stats:
     puzzle.write_stats()
     save_population(puzzle)
-
 
 def main(write_stats, old_pop=False, timer=None, nloop=None, timed=False):
   try:

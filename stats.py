@@ -27,11 +27,11 @@ class Stats(object):
     self.logbook = tools.Logbook()
     self.populations = []
     # Use when Wrote to file or printed to screen
-    self.logbook.header = "generations", "score", "mutation_percent", "mutated", "individual_fitness", "group_fitness"
+    self.logbook.header = "generations", "nb_full_connected", "connections_completions", "score", "selected", "mutation_percent", "mutated", "individual_fitness", "group_fitness"
     self.logbook.chapters['individual_fitness'].header = "min", "avg", "max"
     self.logbook.chapters['group_fitness'].header = "min", "avg", "max"
 
-  def log_stats(self, generation, population, n_mutated, score):
+  def log_stats(self, generation, population, selected, n_mutated, scores):
     """
       Stats to be logged:
         Generation : Represant the iteration you're on
@@ -50,7 +50,8 @@ class Stats(object):
     record = self.stats.compile(population)
     self.populations.append(population)
     self.logbook.record(generations=generation, mutated=n_mutated, mutation_percent=config.mutate_inpd,
-                        score=score, **record)
+                        nb_full_connected=len([x for x in population if x.fitness_ind.values[0] == 4]),
+                        connections_completions=scores[0], score=scores[1], selected=selected, **record)
     # I case we need to keep famous big scores.
     # self.famous.update(self.pop)
 
@@ -132,14 +133,11 @@ def open_population(path):
   return ret
 
 if __name__ == '__main__':
-  g = "gen/lumy_11-02-2017_20h.49m.59s/"
-  import puzzle
+  import puzzle, sys
   puzzle.Puzzle.dynamique_type()
-  stats = open_logboox(g)
-  stats.draw_all_eternity()
-  stats.generate_stats_generations(ftype="avg")
-  stats.generate_stats_generations(ftype="min")
-  stats.generate_stats_generations(ftype="max")
-  stats.generate_graph_per_generations(saved=True, show=False)
+  stats = open_logboox(sys.argv[1])
+  cs, ss = stats.logbook.select("connections_completions", "score")
+  for c, s in zip(cs, ss):
+    print "C %s s %s c - s %s" % (c, s, c - s)
 
 #  print s.logbook
