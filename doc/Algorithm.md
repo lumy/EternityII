@@ -35,6 +35,7 @@ Replace all other individuals exclude by the elitism with a roulette placement a
 On replace, test all rotations and keep the best one
 ~~~
 ### Mutation : ###
+~~~
 Use a mutation ratio
 With this ratio, select random individuals
 Mutate selected individuals rotation from this ratio
@@ -42,6 +43,7 @@ Exchange individual position with an other with this ratio
 Use the same reproduction restrictions
 Mutate corner and border individuals but only with themselves
 Variable mutation between 0 and 20 percent
+~~~
 ***
 Around the algorithm
 ------------
@@ -79,7 +81,7 @@ Generation representation
     Write in logbook 4/4 sides match pieces
 
 ### Tested / Resolved : ###
-[x] \(2\*2\)
-[x] \(3\*3\)
-[ ] \(4\*4\)
-[ ] \(16\*16\)
+- [x] \(2\*2\)
+- [x] \(3\*3\)
+- [ ] \(4\*4\)
+- [ ] \(16\*16\)
