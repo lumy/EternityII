@@ -79,7 +79,7 @@ Around the algorithm
     Write in logbook 4/4 sides match pieces
 
 ### Tested / Resolved : ###
-[x] (2x2)
-[x] (3x3)
-[ ] (4x4)
-[ ] (16x16)
+[x] \(2\*2\)
+[x] \(3\*3\)
+[ ] \(4\*4\)
+[ ] \(16\*16\)
