@@ -68,5 +68,3 @@ Around the algorithm
     Algorithm test on little size puzzle
     Benchmark script to test different puzzle size
     Write in logbook 4/4 sides match pieces
-
-[//]: # [I'm a relative reference to a repository file](../blob/master/LICENSE)
