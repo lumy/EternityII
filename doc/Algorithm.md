@@ -9,7 +9,7 @@ Algorithm
     4 sides ids
 
 ### Population generation : ###
-    Loop on time or generation number
+    Loop on time, generation number or both
     Border and corner restrictions
     Random position and rotation inside
 
@@ -21,7 +21,7 @@ Algorithm
 * Select :
 ~~~
     Never move the top left corner
-    A corner or a border individual must be keep his position
+    A corner or a border individual must stay on their side
     Elitism ratio must evolve
     Exclude individual with individual fitness egal 4
     Random iteration on inside individuals
@@ -31,7 +31,7 @@ Algorithm
 ~~~
     A corner must be placed on a corner position only
     A border must be placed on a border position only
-    Replace all other individuals exclude by the elitism with the restrictions
+    Replace all other individuals exclude by the elitism with a roulette placement and the restrictions
     On replace, test all rotations and keep the best one
 ~~~
 ### Mutation : ###
@@ -47,7 +47,13 @@ Around the algorithm
 ------------
 ### Statistics and logbook : ###
 
-* Logbook :
+* Logbook.txt (text version) :
+~~~
+    connections_completions
+    score
+    selected
+~~~
+* Logbook.pkl (bin version) :
 ~~~
     Actual iteration
     Individual fitness : minimum, maximum, average
@@ -55,8 +61,11 @@ Around the algorithm
     Individuals mutate number
     Generation mutation percentage
     4/4 individual sides match number
+    Connections_completions
+    Score
+    Selected (number of selected/removed tils during select operation)
 ~~~
-* Statistics images :
+* Images statistics :
 ~~~
     Individual and group fitness on each generation
     Generation representation
@@ -68,3 +77,9 @@ Around the algorithm
     Algorithm test on little size puzzle
     Benchmark script to test different puzzle size
     Write in logbook 4/4 sides match pieces
+
+### Tested / Resolved : ###
+[x] (2x2)
+[x] (3x3)
+[ ] (4x4)
+[ ] (16x16)
