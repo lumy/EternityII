@@ -3,26 +3,26 @@
 
 ## Introduction
 
-  some research have been made have a look at our gdoc (link is coming)
+  Some research has been made, have a look at our gdoc (link is coming)
 
   [Current Algorithm](doc/Algorithm.md)
 
 ## Setup
 
-### requirements
+### Requirements
 
-  using pip
+  Using pip
 
   ```bash
   $ pip install -r requirements.txt
   ```
 
   Download the [images](https://intra.epitech.eu/module/2016/M-IAR-752/PAR-9-2/acti-235553/project/file/eternityII_data.zip)
-  and unzip it in the working directory.
+  and unzip them in the working directory.
 
-### configuration and population
+### Configuration and population
 
-The config file config.py got a lot of interesting setting:
+Inside the config file config.py you will find a lot of interesting settings:
 
 ```python
 population_file_base="e2pieces.txt"
@@ -34,15 +34,15 @@ elitism_percentage_up=4
 gen_modulo_elitism=100
 ```
 
-- population_file_base: filename containing the tils to play with.
-  - Few file have been wrote alyready `test_4pieces.txt` `test_9pieces.txt` `test_16pieces.txt`
-- NGEN: Number of default iteration to do. See [iteration](doc/Algorithm.md#iteration)
+- population_file_base: filename containing the tiles to play with.
+  - Few files have been written already `test_4pieces.txt` `test_9pieces.txt` `test_16pieces.txt`
+- NGEN: Default maximum number of iterations to do. See [iteration](doc/Algorithm.md#iteration)
 - mutate_inpd: Percentage of mutation. (between 0 and 1) See [iteration](doc/Algorithm.md#mutation)
 
 ### Workflows. Running Scripts
 
 
-#### The workflow starts by running the script called main then the script render
+#### The workflow starts by running the script called main then the script render.
 
   ```text
   $ python main.py
@@ -51,7 +51,7 @@ gen_modulo_elitism=100
   No Solution Look at the logbook.
   ```
 
-#### Look at the path given for your puzzle. All the stats will be looged there.
+#### Look at the path given for your puzzle. All the stats will be logged there.
 
   ``` text
   $ python render.py gen/lumy_13-02-2017_13h.14m.46s/
@@ -59,7 +59,7 @@ gen_modulo_elitism=100
   progression Bar 1 #################
   progression Bar 2 ########________#
   ```
-  > If you do not see any progressbar it might be because you're not in a real tty
+  > If you do not see any progress bar it might be because you're not in a real tty
   (the package we use seems to work perfectly under all unix/linux but seems
   still in dev for windows and others).
 
@@ -68,7 +68,7 @@ gen_modulo_elitism=100
   $ ./gen/generations_images_to_video.bash gen/lumy_13-02-2017_13h.14m.46s/
   ```
 
-#### benchmark our algorithm you can simply launch algo_benchmark.py as:
+#### To benchmark our algorithm you can simply launch algo_benchmark.py as:
 
   ```text
   $ python algo_benchmark.py
@@ -102,18 +102,18 @@ gen_modulo_elitism=100
 
 ## Codes
 
-The e2pieces.txt contain the pieces per line by direction as (n, s, w, e)
-for easier use we sort them as (n, e, s, w).
+The e2pieces.txt file contains the pieces per line with direction ordered as (n, s, w, e).
+For convienience we order them as (n, e, s, w).
 
-We have now very usefull class and function.
-An Individual in the ind.py file contain:
+We have now our class and function.
+An Individual class in the ind.py file contain:
 ```python
->>> i = Ind(lambda x: (0, [1, 0, 0, 17]), None) # Represent the firt line of the file
->>> i.mask([0, None, None, 0) # return True if the mask correspond to the ind. we check here the 0 to the right side.
+>>> i = Ind(lambda x: (0, [1, 0, 0, 17]), None) # Represents the first line of the file
+>>> i.mask([0, None, None, 0) # Returns True if the mask corresponds to the individual. We check here the 0 to the right side
 False
->>> i.rotate() # Rotate the ind in clock way (to check)
+>>> i.rotate() # Rotate the individual in clock wise (to check)
 
->>> i.count(0) # Return the number of 0 in ind
+>>> i.count(0) # Returns the number of 0 in individual
 2
 >>> i[0]
 1
@@ -121,10 +121,10 @@ False
 17
 ```
 
-Then some usefull in Puzzle:
+Then some usefull functions in Puzzle:
 
 ```python
->>> Puzzle.fit_to_border # rotate an ind until it correspond to a mask
+>>> Puzzle.fit_to_border # Rotate an individual until it corresponds to a mask
 ```
 
 You can easily draw or save a Puzzle:
