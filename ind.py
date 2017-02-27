@@ -50,7 +50,7 @@ class Ind(object):
           return True if the mask is ok with the content
         :param mask: list of None and 0
         :return:
-        """
+    """
     def _mask(m, index, c):
       if c < 4:
         if index >= 4:
