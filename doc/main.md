@@ -19,7 +19,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 ## API
 
 
-### main
+## main
 
   main function will load a new population or an old one and run it with our     [Current Algorithm](doc/Algorithm.md)
 
@@ -31,7 +31,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - timed: that will activate some timer, to calculate how many time for one iteration and for the whole iteration.
 
 
-### loop
+## loop
 
   This function loop with stopping conditions as set in params. Write the     logbook at the end of the run.
 
@@ -45,10 +45,9 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - return [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values): is the solution has been found or not
 
 
-### one_turn
+## one_turn
 
   Represent One iteration of the Algorithm.
-
   Ex.
 
   1. select
@@ -59,6 +58,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 
   More information at [Current Algorithm](doc/Algorithm.md)
 
+
 - [puzzle](doc/puzzle.md): A [Puzzle](doc/puzzle.md) object.
 - [int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex) generation: Iteration index.
 - [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) write_stats: Should we be logging stats. Used during benchmark,   otherwise always set to True.
@@ -66,7 +66,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - return [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values): solution as been found or Not.
 
 
-### get_args
+## get_args
 
   Function to Set and Parse args with argparse.
 
@@ -75,7 +75,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - return: object
 
 
-### save_population
+## save_population
 
   Save a given puzzle into the path config.population_file_saved.
 
@@ -87,7 +87,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - throw [Exception](https://docs.python.org/2/tutorial/errors.html): Can throw classic exception around open and dill.dump
 
 
-### load_population
+## load_population
 
   Load an old population or a new one. If old_pop is False, the new     population will be loaded from config.population_file_base.
 
@@ -97,11 +97,11 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - return: A [Puzzle](doc/puzzle.md) object.
 
 
-### _load_file
+## _load_file
 
   Use to load a file with dill, used for loading puzzle. file should have     been wrote with dill.
 
 
-- [str](https://docs.python.org/2/library/stdtypes.html#sequence-types-str-unicode-list-tuple-bytearray-buffer-xrange) path: path to the file to load
+- [str](https://docs.python.org/2/library/stdtypes.html#sequence-types-str-unicode-[list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists)-tuple-bytearray-buffer-xrange) path: path to the file to load
 
 - return: object (excepted [Puzzle](doc/puzzle.md) but no check is made)

@@ -1,29 +1,19 @@
+"""
+  puzzle module contain Puzzle object.
+
+"""
 import getpass
 import random
 import copy
-import string
-import numpy
 import os
+import config
+import eternity
+import eval
+import stats
 from deap import base
 from deap import creator
 from deap import tools
 from datetime import datetime
-
-import graphs
-import config
-import ind
-import eternity
-# Not use for now but for easier read i guess all eval code should go there.
-import eval
-import stats
-
-# config.corner_pos = [0, 15, 240, 255]
-# config.border_left_pos = [31, 47, 63, 79, 95, 111, 127, 143, 159, 175, 191, 207, 223, 239]
-# config.border_right_pos = [16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224]
-# config.border_top_pos = range(1, 15)
-# config.border_bot_pos = range(241, 255)
-# config.inside_pos = [x for x in range(0, 255) if x not in config.corner_pos and x not in config.border_pos_pos]
-# config.border_pos_pos = config.border_top_pos + config.border_bot_pos + config.border_left_pos + config.border_right_pos
 
 # Coins Hautgauche, Hautdroit, basGauche, basDroit
 
@@ -36,32 +26,56 @@ MASK_TOP = [0, None, None, None]
 MASK_BOT = [None, None, 0, None]
 MASK_LEFT = [None, 0, None, None]
 MASK_RIGHT = [None, None, None, 0]
-# Toutes les positions de X en dehors des coins et des bords
 
 class Puzzle(object):
   """
-  Represant the game. Contain a population of each and get One fitnessValue.
+    Puzzle represent a board game, it contain a population of \
+    [Individuals](doc/ind.md)
+
+  Puzzle Description:
+
+  - self.personal_path: path where the stats are gonna be wrote.
+  - self.completion: Completion of puzzle.
+  - self.connections_completions: Connections completions.
+  - self.toolbox: deap.toolbox
+  - self.population: current population
+  - self.stats: [Stats instance](doc/stats.md)
   """
+
   @staticmethod
   def dynamique_type():
-    # Creation des deux valeurs
+    """
+      Static Method. Create dynamique Type used by deap.
+      This method needs to be called before any loading file.
+
+      Create static type:
+
+      - FitnessInd
+      - FitnessGroup
+      - Individual
+
+      Can be found at ```deap.creator.FitnessInd``` or \
+      ```deap.creator.Individual```
+    """
     creator.create("FitnessInd", base.Fitness, weights=(1,))
     creator.create("FitnessGroup", base.Fitness, weights=(1,))
-    # Individu creation
     creator.create("Individual", ind.Ind, fitness_ind=creator.FitnessInd, fitness_group=creator.FitnessGroup)
 
 
-  # Constructor
   def __init__(self, lines):
     current_time = datetime.now().strftime("%d-%m-%Y_%Hh.%Mm.%Ss")
     user = getpass.getuser()
     self.personal_path = "gen/%s_%s/" % (user, current_time)
-    create_subdir(self.personal_path)
     self.index_line = 0
+    self.completion = 0.0
+    self.connections_completions = 0.0
+
+    try:
+      os.mkdir(self.personal_path)
+    except Exception as e:
+      print e
     print "Personal Path used for this Puzzle: %s" % self.personal_path
 
-    self.completion = 0.0 # current puzzle completion in percentage
-    # Pseudo random. put corners at corners and border at border
     arr = list(self.randomize_lines(*lines))
     Puzzle.dynamique_type()
     self.toolbox = base.Toolbox()
@@ -72,17 +86,17 @@ class Puzzle(object):
     self.fixing_outside()
     # Init the stats we want to log
     self.stats = stats.Stats(self.personal_path)
-    self.connections_completions = 0.0
-    self.completion = 0.0
     self.evaluate()
     self.log_stats(-1, 0, 0)
 
   # Stats Function
   def log_stats(self, generation, rm_tils, n_mutated):
     """
-    Do that at each iteration.
-    :param generation:
-    :param n_mutated:
+      Log statistics, do that at each iteration, more info [@stats file](doc/stats.md)
+
+    :param int generation: Iteration Index.
+    :param int rm_tils: Number of selected/replaced tils.
+    :param int n_mutated: Number of mutated element at this iteration.
     :return:
     """
     self.stats.log_stats(generation, copy.deepcopy(self.population), rm_tils, n_mutated, (self.connections_completions, self.completion))
@@ -90,27 +104,37 @@ class Puzzle(object):
     
   def write_stats(self):
     """
-    You can do that once you finished the main loop
-    :return:
+      Write the stats. More info [@stats file](doc/stats.md).
     """
     self.stats.write()
   # End Stats Function
 
   def mutate_position(self, index, list_positions):
     """
-      If only one position in the list position will return (could do but it would be an useless procs calls.
-    :param index:
-    :param list_positions:
-    :return:
+      Change the position between index and a random pos from list_position.
+
+    :param int index: The index that going to be mutated.
+    :param list list_positions: list of int, all position possible to change.
     """
     if len(list_positions) <= 1:
       return
     other = index
     while (index == other):
       other = random.randint(0, len(list_positions) - 1)
-    self.population[index], self.population[list_positions[other]] = self.population[list_positions[other]], self.population[index]
+    self.population[index], self.population[list_positions[other]] = \
+        self.population[list_positions[other]], self.population[index]
 
   def _mutate(self, positions):
+    """
+      Goes through all positions given in parameters and apply a mutation. If \
+      random.uniform(0, 1) <= config.mutate_inpd Do a mutation. Mutation can be \
+      One of these 3 type: [mutate_position](#mutate_position) \
+      [mutate_rotation](ind.md#rotates), mutation_position_rotation \
+      (both at same time in this order).
+
+    :param list positions: a list of position to go through.
+    :return int: Number of mutated element.
+    """
     mutated = 0
     for x in positions:
       if random.uniform(0, 1) <= config.mutate_inpd:
@@ -126,6 +150,12 @@ class Puzzle(object):
 
 
   def mutate(self):
+    """
+      Apply mutation on every [positions type](doc/config.md#positions). call \
+      [self.fixing_outside](#fixing_outside).
+
+    :return int: Number of mutated element.
+    """
     mutation_counter = self._mutate(config.inside_pos)
     mutation_counter += self._mutate(config.border_pos)
     mutation_counter += self._mutate(config.corner_pos)
@@ -134,23 +164,13 @@ class Puzzle(object):
 
   def evaluate(self):
     """
-
-    :return:
+      Call the [evaluate function from eval module](doc/eval.md). set value for \
+      ```self.connections_completions``` ```self.completion``` and for every \
+      individuals fitnesses (ind and groups)
     """
     # individuals, individual's clusters, and puzzle completion evaluations
     individuals_s, individuals_clusters_s, puzzle_completion, connections_completion, nb_individuals_per_ind_score = eval.eval_solution(self.population)
 
-    # print "individuals evaluation:"
-    # for index in range(0, 16):
-    #   print individuals_s[index * 16: (index * 16) + 16]
-    # print
-
-    # print "individuals clusters evaluation:"
-    # for index in range(0, 16):
-    #   print individuals_clusters_s[index * 16: (index * 16) + 16]
-    # print
-
-    # print "puzzle completion:", puzzle_completion, "%\n"
     self.connections_completions = connections_completion
     self.completion = puzzle_completion
     for individual, individual_s, cluster_s in zip(self.population, individuals_s, individuals_clusters_s):
@@ -206,9 +226,10 @@ class Puzzle(object):
 
   def get_mask(self, index):
     """
-      return the Mask for a given index
-    :param index: int index of population
-    :return:
+      return the [mask](doc/mask.md) for a given index
+
+    :param int index: index to extract [mask](doc/mask.md) of.
+    :return list: [mask](doc/mask.md)
     """
     def _get_mask(dir, ldir):
       n, n_i = eval.get_individual_neighbor(self.population, index,
@@ -231,7 +252,7 @@ class Puzzle(object):
 
   def roulette(self, elems, k):
     """
-      Please have a look at https://github.com/DEAP/deap/blob/master/deap/tools/selection.py
+      Please have a look at [deap roulette function](https://github.com/DEAP/deap/blob/master/deap/tools/selection.py)
       It's cleary inspired of the function selRoulette.
       Thanks to deap.
     :param elems:
@@ -255,12 +276,12 @@ class Puzzle(object):
 
   def place_type(self, list_type, pos_type):
     """
-        - get X positions valuable for now and put it at a random one.
-        - Look for new free conncted position to add to the typelist
-        - Place the next til
-    :param list_type:
-    :param pos_type:
-    :return:
+      - get X positions valuable for now and put it at a random one.
+      - Look for new free conncted position to add to the typelist
+      - Place the next til
+
+    :param list list_type: list of [ind](doc/ind.md)
+    :param list pos_type: list of int
     """
     if len(list_type) == 0:
       return
@@ -280,8 +301,8 @@ class Puzzle(object):
       - for each type of tils
         - get X positions valuable for now and put it at a random one.
         - Look for new free conncted position to add to the typelist
-    :param removed_tils:
-    :return:
+
+    :param list removed_tils: list of [ind](doc/ind.md)
     """
     # Get corners, borders and centers tils in removed_tils
     list_corner = [ind for ind in removed_tils if ind.count(0) == 2]
@@ -303,6 +324,13 @@ class Puzzle(object):
   #  Tools function   #
   #####################
   def fixing_outside(self):
+    """
+      Use to make match each corner/border to the right [mask](doc/mask.md).
+
+      *Warning* This is an unsafe function, from few test, if the corner CAN'T
+      fit the mask, (ex: mask [0,0,None,None] tils [0,1,2,3]) it will make an \
+      infinite loop.
+    """
     for index, mask in zip(config.corner_pos, MASK_CORNERS):
       self.fit_to_border(self.population[index], mask)
     for index in config.border_bot_pos:
@@ -317,12 +345,22 @@ class Puzzle(object):
   def fit_to_border(self, ind, type):
     """
       Rotate the pieces until it feet with the border.
-    :param ind:
-    :param type: list of None and 0 for direction to fit.
+
+      *Warning*: This can generate an infinite loop ! if ind can fit mask \
+      because of missing 0 or because of number not present. Use carefully.
+
+    :param [ind](doc/ind.md) ind:
+    :param list type: list of None and int to fit.
     :return:
     """
     while not ind.mask(type):
       ind.rotate()
+
+  # Init Functions
+  def _get_line_(self, arr):
+    i = self.index_line
+    self.index_line += 1
+    return arr[i]
 
   def give_random_pos(self, pos, line):
     r = []
@@ -334,8 +372,10 @@ class Puzzle(object):
 
   def randomize_lines(self, lc, lb, li):
     """
-      Trying to have an half randomize algorithm
-    :return:
+      Used during init, if it's a new population then we place them by \
+      [type](doc/ind.md#type) and randomly.
+
+    :return: yield line organize but randomize.
     """
     lc = self.give_random_pos(copy.copy(config.corner_pos), lc)
     lb = self.give_random_pos(copy.copy(config.border_pos), lb)
@@ -344,7 +384,51 @@ class Puzzle(object):
     f = lambda lst, index, c: lst[c][1] if lst[c][0] == index else f(lst, index, c + 1)
     for x in xrange(0, len(l)):
       yield f(l, x, 0)
+  # End Init Functions
 
+  def generate_graph_per_generations(self, saved=True, show=False):
+    """
+      See [@stats file](doc/stats.md#generate_graph_per_generations)
+
+    :param saved:
+    :param show:
+    """
+    self.stats.generate_graph_per_generations(saved=saved, show=show)
+
+  def generate_stats_generations(self, ftype="avg", saved=True, show=False):
+    """
+      See [@stats file](doc/stats.md#generate_stats_generations)
+
+    :param ftype:
+    :param saved:
+    :param show:
+    """
+    self.stats.generate_stats_generations(ftype=ftype, saved=saved, show=show)
+
+
+  def save_picture(self, gen=0, score=0):
+    """
+      See [@eternity file](doc/eternity.md#save)
+
+    :param gen:
+    :param score:
+    :return:
+    """
+    eternity.save(self.population,
+                  "%s/gen_%s_score_%s" % (self.personal_path, gen, score))
+
+  def draw_generation(self, n):
+    """
+      See [@stats file](doc/stats.md#draw_generation)
+
+    :param n:
+    :return:
+    """
+    self.stats.draw_generation(n)
+
+  def draw_all_generations(self):
+    """See [@stats file](doc/stats.md#draw_all_eternity)"""
+    self.stats.draw_all_eternity()
 
   def __len__(self):
     return len(self.population)
@@ -352,33 +436,10 @@ class Puzzle(object):
   def __repr__(self):
     return repr(self.personal_path)
 
-  def generate_graph_per_generations(self, saved=True, show=False):
-    self.stats.generate_graph_per_generations(saved=saved, show=show)
 
-  def generate_stats_generations(self, ftype="avg", saved=True, show=False):
-    self.stats.generate_stats_generations(ftype=ftype, saved=saved, show=show)
-
-
-  def _get_line_(self, arr):
-    i = self.index_line
-    self.index_line += 1
-    return arr[i]
-
-  def save_picture(self, gen=0, score=0):
-    eternity.save(self.population, "%s/gen_%s_score_%s" % (self.personal_path, gen, score))
-
-  def draw_generation(self, n):
-    self.stats.draw_generation(n)
-
-  def draw_all_generations(self):
-    self.stats.draw_all_eternity()
-
-def create_subdir(s):
-  try:
-    os.mkdir(s)
-  except Exception as e:
-    print e
-
+__md__ = [
+  'Puzzle'
+]
 
 if __name__ == '__main__':
   import ind
