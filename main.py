@@ -33,7 +33,8 @@ os.environ['TK_LIBRARY'] = "C:\\Python27\\tcl\\tk8.5"
 
 def _load_file(path):
   """
-    Use to load a Puzzle with dill.
+    Use to load a file with dill, used for loading puzzle. file should have \
+    been wrote with dill.
 
   :param str path: path to the file to load
   :return: object (excepted [Puzzle](doc/puzzle.md) but no check is made)

@@ -24,10 +24,10 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
   main function will load a new population or an old one and run it with our     [Current Algorithm](doc/Algorithm.md)
 
 
- - [Bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) write_stats: Should we be logging stats. Used during benchmark,   otherwise always set to True.
-- [Bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) old_pop: loading the old population saved at   config.population_file_saved
-- float timer: see [loop](doc/main.md#loop)
-- int nloop: see [loop](doc/main.md#loop)
+ - [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) write_stats: Should we be logging stats. Used during benchmark,   otherwise always set to True.
+- [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) old_pop: loading the old population saved at   config.population_file_saved
+- [float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex) timer: see [loop](doc/main.md#loop)
+- [int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex) nloop: see [loop](doc/main.md#loop)
 - timed: that will activate some timer, to calculate how many time for one iteration and for the whole iteration.
 
 
@@ -37,12 +37,12 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 
 
 - [puzzle](doc/puzzle.md): A [puzzle](doc/puzzle.md) object.
-- [Bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) write_stats: Should we be logging stats. Used during benchmark,   otherwise always set to True.
-- int nloop: Number of loop to do, if -1 will not be used to stop the   loop.
-- float timer: Minute to turn the loop if None will not be used to stop   loop.
+- [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) write_stats: Should we be logging stats. Used during benchmark,   otherwise always set to True.
+- [int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex) nloop: Number of loop to do, if -1 will not be used to stop the   loop.
+- [float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex) timer: Minute to turn the loop if None will not be used to stop   loop.
 
 
-- return bool: is the solution has been found or not
+- return [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values): is the solution has been found or not
 
 
 ### one_turn
@@ -60,10 +60,10 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
   More information at [Current Algorithm](doc/Algorithm.md)
 
 - [puzzle](doc/puzzle.md): A [Puzzle](doc/puzzle.md) object.
-- int generation: Iteration index.
-- [Bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) write_stats: Should we be logging stats. Used during benchmark,   otherwise always set to True.
+- [int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex) generation: Iteration index.
+- [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) write_stats: Should we be logging stats. Used during benchmark,   otherwise always set to True.
 
-- return bool: solution as been found or Not.
+- return [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values): solution as been found or Not.
 
 
 ### get_args
@@ -84,7 +84,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 
 - return: None
 
-- throw Exception: Can throw classic exception around open and dill.dump
+- throw [Exception](https://docs.python.org/2/tutorial/errors.html): Can throw classic exception around open and dill.dump
 
 
 ### load_population
@@ -92,16 +92,16 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
   Load an old population or a new one. If old_pop is False, the new     population will be loaded from config.population_file_base.
 
 
-- [Bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) old_pop: loading the old population saved at   config.population_file_saved
+- [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) old_pop: loading the old population saved at   config.population_file_saved
 
 - return: A [Puzzle](doc/puzzle.md) object.
 
 
 ### _load_file
 
-  Use to load a Puzzle with dill.
+  Use to load a file with dill, used for loading puzzle. file should have     been wrote with dill.
 
 
-- [Str](https://docs.python.org/2/library/stdtypes.html#sequence-types-str-unicode-list-tuple-bytearray-buffer-xrange) path: path to the file to load
+- [str](https://docs.python.org/2/library/stdtypes.html#sequence-types-str-unicode-list-tuple-bytearray-buffer-xrange) path: path to the file to load
 
 - return: object (excepted [Puzzle](doc/puzzle.md) but no check is made)
