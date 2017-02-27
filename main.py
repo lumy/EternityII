@@ -7,9 +7,12 @@
 
   ```--loop|-l``` Number of loop maximum to do. if set to -1 it will not be \
   used to stop the loop(default: config.NGEN).
+
   ```--time|-t``` Maximum time to execute the loop in min, if not set will not \
-  be used to stop the loop (default: None)
+  be used to stop the loop (default: None).
+
   ```--timed``` iteration and loop would be timed. (not really usefull).
+
   ```--old-pop|-o``` Load an old population. path is set in config file at \
   config.population_file_saved.
 """
