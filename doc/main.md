@@ -19,7 +19,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 # Functions
 
 
-## main
+### main(write_stats, old_pop=False, timer=None, nloop=None, timed=False)
 
   main function will load a new population or an old one and run it with our     [Current Algorithm](doc/Algorithm.md)
 
@@ -31,7 +31,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - timed: that will activate some timer, to calculate how many time for one iteration and for the whole iteration.
 
 
-## loop
+### loop(puzzle, write_stats, nloop=None, timer=None)
 
   This function loop with stopping conditions as set in params. Write the     logbook at the end of the run.
 
@@ -45,7 +45,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - return [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values): is the solution has been found or not
 
 
-## one_turn
+### one_turn(puzzle, generation, write_stats)
 
   Represent One iteration of the Algorithm.
   Ex.
@@ -66,7 +66,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - return [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values): solution as been found or Not.
 
 
-## get_args
+### get_args()
 
   Function to Set and Parse args with argparse.
 
@@ -75,7 +75,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - return: object
 
 
-## save_population
+### save_population(puzzle)
 
   Save a given puzzle into the path config.population_file_saved.
 
@@ -87,7 +87,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - throw [Exception](https://docs.python.org/2/tutorial/errors.html): Can throw classic exception around open and dill.dump
 
 
-## load_population
+### load_population(old_pop=False)
 
   Load an old population or a new one. If old_pop is False, the new     population will be loaded from config.population_file_base.
 
@@ -97,7 +97,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - return: A [Puzzle](doc/puzzle.md) object.
 
 
-## _load_file
+### _load_file(path)
 
   Use to load a file with dill, used for loading puzzle. file should have     been wrote with dill.
 

@@ -5,7 +5,11 @@ Use to represent an individual a 4 int direction and a rotation. (and an uid to 
 
 
 # Class
-#### _mask_
+# 
+
+
+
+### _mask_(self, mask, c_index=0)
 
   return True if the mask is ok with the content
 
@@ -14,7 +18,7 @@ Use to represent an individual a 4 int direction and a rotation. (and an uid to 
 - return:
 
 
-#### best_value_of_mask
+### best_value_of_mask(self, mask)
 
 
 - mask:
@@ -22,7 +26,7 @@ Use to represent an individual a 4 int direction and a rotation. (and an uid to 
 - return:
 
 
-#### count
+### count(self, obj)
 
     Use to count how many occurencences of the color in the current ind
 
@@ -31,7 +35,19 @@ Use to represent an individual a 4 int direction and a rotation. (and an uid to 
 - return:
 
 
+### mask(self, mask, c_index=0)
 
+
+
+
+
+### rotate(self)
+
+
+
+
+
+### rotates(self, nb)
 
 
 
@@ -42,7 +58,7 @@ Use to represent an individual a 4 int direction and a rotation. (and an uid to 
 # Functions
 
 
-## get_population
+### get_population()
 
 Load the basic Population from the file e2pieces.txt
 

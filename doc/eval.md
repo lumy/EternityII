@@ -7,7 +7,7 @@
 # Functions
 
 
-## eval_solution
+### eval_solution(population)
 
   Evaluate the whole population on the solution.
 
@@ -26,7 +26,7 @@
 - return (individuals_score, individuals_cluster_score, puzzle_completion):
 
 
-## eval_individual
+### eval_individual(population, index, individuals_score, individuals_cluster_score, cluster_score = 0, level = 0, cluster = [])
 
   Evaluate the individual's and individual's clusters scores starting from an individual
 
@@ -42,7 +42,7 @@
 - return cluster_score: individual's cluster's score
 
 
-## get_individual_neighbor
+### get_individual_neighbor(population, index, x, y, direction)
 
   Retrieve the individual's neighbor from coordinates and direction
 
