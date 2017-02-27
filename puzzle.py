@@ -10,6 +10,7 @@ import config
 import eternity
 import eval
 import stats
+from ind import Ind
 from deap import base
 from deap import creator
 from deap import tools
@@ -59,7 +60,7 @@ class Puzzle(object):
     """
     creator.create("FitnessInd", base.Fitness, weights=(1,))
     creator.create("FitnessGroup", base.Fitness, weights=(1,))
-    creator.create("Individual", ind.Ind, fitness_ind=creator.FitnessInd, fitness_group=creator.FitnessGroup)
+    creator.create("Individual", Ind, fitness_ind=creator.FitnessInd, fitness_group=creator.FitnessGroup)
 
 
   def __init__(self, lines):
