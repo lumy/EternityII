@@ -58,6 +58,12 @@ def one_turn(puzzle, generation, write_stats):
   n_mutated = puzzle.mutate()
   # Evaluate the entire population
   puzzle.evaluate()
+  #if last_con > puzzle.connections_completions:
+   # print "Score going down. Avoiding ? ", generation
+    #puzzle.population = puzzle.stats.populations[-1]
+    # if config.mutate_inpd == 0.0005:
+    #   config.mutate_inpd = 0.05
+  #  return
   if write_stats:
     # If you want log the different data
     puzzle.log_stats(generation, rm_tils, n_mutated)
@@ -78,11 +84,9 @@ def loop(puzzle, write_stats, nloop=None, timer=None):
   iteration = 0
   if timer:
     end_time = time.time() + datetime.timedelta(minutes=timer).total_seconds()
-  
   while (nloop == -1 or iteration < nloop) and (end_time is None or time.time() < end_time):
 
     if one_turn(puzzle, iteration, write_stats):
-      print "Solution Found !"
       if write_stats:
         # Saving logbook
         puzzle.write_stats()
@@ -91,17 +95,31 @@ def loop(puzzle, write_stats, nloop=None, timer=None):
       # Write the populations to a file to free some memory
       puzzle.stats.free_memory()
     iteration += 1
-  print "No Solution Look at the logbook."
   if write_stats:
     puzzle.write_stats()
     save_population(puzzle)
 
-def main(write_stats, old_pop=False, timer=None, nloop=None, timed=False):
+def main(write_stats, old_pop=False, timer=None, nloop=None, timed=False, input_grid=None):
+  """
+    main function will load a new population or an old one and run it.
+
+  :param write_stats:
+  :param old_pop:
+  :param timer:
+  :param nloop:
+  :param timed: that will activate some timer, to calculate how many time for one iteration and for the whole iteration.
+  :return:
+  """
+  if input_grid != None:
+    config.population_file_base = input_grid
+    config.init()
+    import eval
+    reload(eval)
+
   try:
     os.mkdir("./gen/")
   except Exception as e:
     pass
-
   puzzle = load_population(old_pop)
   if timed:
     timed_loop.timed_loop(puzzle, write_stats, (one_turn, save_population), timer=timer, nloop=nloop)

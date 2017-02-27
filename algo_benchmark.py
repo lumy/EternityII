@@ -26,7 +26,7 @@ def parse_arguments():
 
 def prepare_grid_benchmark(input_grid, nb_executions):
     for i in range(nb_executions):
-        process = Process(target=algorithm.main, args=(False,))
+        process = Process(target=algorithm.main, args=(False,), kwargs={'old_pop':False, 'timer':None, 'nloop':config.NGEN, 'timed':False, 'input_grid':input_grid})
         processes_pool.append((process, input_grid))
 
 def record_process_start():
@@ -55,9 +55,6 @@ def launch_benchmark(nb_executions):
         while nb_current_executions == nb_executions:
             nb_current_executions = find_ended_processes(nb_current_executions)
             time.sleep(0.01)
-
-        config.population_file_base = process_config
-        config.init()
         eval.init_virgin_scores_list()
 
         running_processes_pool.append(i)
@@ -101,7 +98,8 @@ def main(args):
     print "nb_executions_per_grid_size", args.nb_executions_per_grid_size
     prepare_grid_benchmark("test_4pieces.txt", args.nb_executions_per_grid_size)
     # our algorithm currently does not solve 3x3 puzzle
-    # prepare_grid_benchmark("test_9pieces.txt", args.nb_executions_per_grid_size)
+    prepare_grid_benchmark("test_9pieces.txt", args.nb_executions_per_grid_size)
+    # prepare_grid_benchmark("test_16pieces.txt", args.nb_executions_per_grid_size)
     print "\nlaunching benchmark..."
     launch_benchmark(args.nb_parallel_executions)
     print "\ncomputing stats from benchmark records..."
