@@ -16,7 +16,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 ```--old-pop|-o``` Load an old population. path is set in config file at   config.population_file_saved.
 
 
-## API
+# Functions
 
 
 ## main

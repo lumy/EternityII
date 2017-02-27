@@ -4,10 +4,8 @@ puzzle module contain Puzzle object.
 
 
 
-## API
-
-
-### Class: Puzzle
+# Class
+## Puzzle
 
   Puzzle represent a board game, it contain a population of     [Individuals](doc/ind.md)
 
