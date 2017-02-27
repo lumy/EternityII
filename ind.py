@@ -1,5 +1,5 @@
 """
-Use to represent an individual a 4 int direciton and a rotation. (and an uid to keep the line reference)
+Use to represent an individual a 4 int direction and a rotation. (and an uid to keep the line reference)
 """
 import copy
 
@@ -90,6 +90,10 @@ class Ind(object):
   def __repr__(self):
     return "n:%s e:%s s:%s w:%s" % (self.content[0], self.content[1], self.content[2], self.content[3])
 
+__md__ = [
+  "get_population",
+  "Ind"
+]
 
 if __name__ == '__main__':
   i = Ind(lambda x: (0, [1, 0, 0, 17]), None)

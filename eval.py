@@ -10,13 +10,13 @@ WEST = 3
 
 virgin_score_list = []
 
+# UNCOOL
 def init_virgin_scores_list():
   del virgin_score_list[:]
   for index in range(0, config.total):
       virgin_score_list.append(None);
 
 init_virgin_scores_list()
-
 def get_individual_neighbor(population, index, x, y, direction):
   """
     Retrieve the individual's neighbor from coordinates and direction
@@ -156,3 +156,11 @@ def eval_individual_score(population, index):
     if neighbor == None or individual[individual_side] == neighbor[neighbor_side]:
       individual_score += 1
   return individual_score
+
+__md__ = [
+  "eval_individual_score",
+  "eval_solution",
+  "eval_individual",
+  "get_individual_neighbor",
+  "init_virgin_scores_list",
+]
