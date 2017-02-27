@@ -2,20 +2,31 @@
 
 SYM_LINKS_FORMAT="%010d"
 OUTPUT_NAME="puzzle_life.mpeg"
+FFMPEG=$(which ffmpeg)
+LN=$(which ln)
+if [[ "" == "$LN" ]]; then
+  LN=$(which cp)
+else
+  LN="$LN -s"
+fi
+if [[ "" == "$FFMPEG" ]]; then
+  echo "You need ffmpeg installed"
+  exit -1
+fi
 
 function create_symbolic_links()
 {
     local -i index=0
     local IFS_SAVE=$IFS
 
-    while IFS= read -r line; do
-	local -x symbolic_link=`printf "$SYM_LINKS_FORMAT%s" $index ".jpeg"`
+    for line in `ls`; do
+    local -x symbolic_link=`printf "$SYM_LINKS_FORMAT%s" $index ".jpeg"`
 
-	ln -sf "$line" "$symbolic_link"
-  # cp -f "$line" "$symbolic_link"
+	$LN -f "$line" "$symbolic_link"
+#    cp -f "$line" "$symbolic_link"
 
 	index=$((index + 1))
-    done <<< `ls -tr gen_*`
+    done
     IFS=$IFS_SAVE
 }
 
@@ -24,12 +35,12 @@ function delete_symbolic_links()
     local -i index=0
     local IFS_SAVE=$IFS
 
-    while IFS= read -r line; do
+    for line in `ls`; do
 	local -x symbolic_link=`printf "$SYM_LINKS_FORMAT%s" $index ".jpeg"`
 
-	rm "$symbolic_link"
+	rm -f "$symbolic_link"
 	index=$((index + 1))
-    done <<< `ls -tr gen_*`
+    done
     IFS=$IFS_SAVE
 }
 
@@ -38,10 +49,11 @@ if ! [ $1 ]; then
     exit 1
 fi
 
-cd "$1/images"
+cd "$1"
+cd "images"
 
-create_symbolic_links
+# create_symbolic_links
 
-ffmpeg -i "$SYM_LINKS_FORMAT.jpeg" "$OUTPUT_NAME"
+$FFMPEG -framerate 0.80  -i  "$SYM_LINKS_FORMAT.jpeg" -r 30 "$OUTPUT_NAME"
 
-delete_symbolic_links
+#delete_symbolic_links
