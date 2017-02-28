@@ -4,8 +4,9 @@ puzzle module contain Puzzle object.
 
 
 
+
 # Class
-# 
+## Puzzle(self, lines)
 
     Puzzle represent a board game, it contain a population of     [Individuals](doc/ind.md)
     
@@ -17,10 +18,17 @@ puzzle module contain Puzzle object.
     - self.toolbox: deap.toolbox
     - self.population: current population
     - self.stats: [Stats instance](doc/stats.md)
+    
+    
+    
+
+  - lines:
+  
 
 ### \_get_line_(self, arr)
 
     
+
 
 
 
@@ -32,6 +40,7 @@ puzzle module contain Puzzle object.
 - [list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists) positions: a [list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists) of position to go through.
 
 - return [int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex): Number of mutated element.
+
 
 
 ### crossover(self, removed_tils)
@@ -47,9 +56,11 @@ puzzle module contain Puzzle object.
 - [list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists) removed_tils: [list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists) of [ind](doc/ind.md)
 
 
+
 ### draw_all_generations(self)
 
     See [@stats file](doc/stats.md#draw_all_eternity)
+
 
 
 
@@ -61,6 +72,7 @@ puzzle module contain Puzzle object.
 - n:
 
 - return:
+
 
 
 ### dynamique_type()
@@ -78,9 +90,11 @@ puzzle module contain Puzzle object.
 
 
 
+
 ### evaluate(self)
 
     Call the [evaluate function from eval module](doc/eval.md). set value for       ```self.connections_completions``` ```self.completion``` and for every       individuals fitnesses (ind and groups)
+
 
 
 
@@ -97,12 +111,14 @@ puzzle module contain Puzzle object.
 - return:
 
 
+
 ### fixing_outside(self)
 
     Use to make match each corner/border to the right [mask](doc/mask.md).
     
     *Warning* This is an unsafe function, from few test, if the corner CAN'T
     fit the mask, (ex: mask [0,0,None,None] tils [0,1,2,3]) it will make an       infinite loop.
+
 
 
 
@@ -115,6 +131,7 @@ puzzle module contain Puzzle object.
 - show:
 
 
+
 ### generate_stats_generations(self, ftype="avg", saved=True, show=False)
 
     See [@stats file](doc/stats.md#generate_stats_generations)
@@ -123,6 +140,7 @@ puzzle module contain Puzzle object.
 - ftype:
 - saved:
 - show:
+
 
 
 ### get_mask(self, index)
@@ -135,9 +153,11 @@ puzzle module contain Puzzle object.
 - return [list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists): [mask](doc/mask.md)
 
 
+
 ### give_random_pos(self, pos, line)
 
     
+
 
 
 
@@ -153,6 +173,7 @@ puzzle module contain Puzzle object.
 - return:
 
 
+
 ### mutate(self)
 
     Apply mutation on every [positions type](doc/config.md#positions). call       [self.fixing_outside](#fixing_outside).
@@ -162,6 +183,7 @@ puzzle module contain Puzzle object.
 - return [int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex): Number of mutated element.
 
 
+
 ### mutate_position(self, index, list_positions)
 
     Change the position between index and a random pos from list_position.
@@ -169,6 +191,7 @@ puzzle module contain Puzzle object.
 
 - [int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex) index: The index that going to be mutated.
 - [list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists) [list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists)_positions: [list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists) of [int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex), all position possible to change.
+
 
 
 ### place_type(self, list_type, pos_type)
@@ -182,6 +205,7 @@ puzzle module contain Puzzle object.
 - [list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists) pos_type: [list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists) of [int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex)
 
 
+
 ### randomize_lines(self, lc, lb, li)
 
     Used during init, if it's a new population then we place them by       [type](doc/ind.md#type) and randomly.
@@ -189,6 +213,7 @@ puzzle module contain Puzzle object.
 
 
 - return: yield line organize but randomize.
+
 
 
 ### roulette(self, elems, k)
@@ -203,6 +228,7 @@ puzzle module contain Puzzle object.
 - return:
 
 
+
 ### save_picture(self, gen=0, score=0)
 
     See [@eternity file](doc/eternity.md#save)
@@ -212,6 +238,7 @@ puzzle module contain Puzzle object.
 - score:
 
 - return:
+
 
 
 ### select(self, generation, con_complt, score)
@@ -225,15 +252,18 @@ puzzle module contain Puzzle object.
 - return:
 
 
+
 ### set_individual_best_mask(self, ind, pos, mask)
 
     
 
 
 
+
 ### write_stats(self)
 
     Write the stats. More info [@stats file](doc/stats.md).
+
 
 
 
