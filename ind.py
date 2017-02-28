@@ -20,6 +20,7 @@ class Ind(object):
   def __init__(self, f, l):
     """
        The Individual reorganize the line in CLOCKWORK MOD (orange ?) so it can easily rotate them.
+
     :param uid: Represant the id of the tile for final printing
     :param line: Line in order North South Weast East.
     """
