@@ -64,6 +64,9 @@ class Puzzle(object):
 
 
   def __init__(self, lines):
+    """
+    :param lines:
+    """
     current_time = datetime.now().strftime("%d-%m-%Y_%Hh.%Mm.%Ss")
     user = getpass.getuser()
     self.personal_path = "gen/%s_%s/" % (user, current_time)
