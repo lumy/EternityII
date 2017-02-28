@@ -3,8 +3,6 @@
 
 ## Introduction
 
-  some research have been made have a look at our gdoc (link is coming)
-
   [Current Algorithm](doc/Algorithm.md)
 
 ## Setup
