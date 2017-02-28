@@ -97,7 +97,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 - return: A [Puzzle](doc/puzzle.md) object.
 
 
-### _load_file(path)
+### \_load_file(path)
 
     Use to load a file with dill, used for loading puzzle. file should have     been wrote with dill.
     

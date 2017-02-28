@@ -18,13 +18,13 @@ puzzle module contain Puzzle object.
     - self.population: current population
     - self.stats: [Stats instance](doc/stats.md)
 
-### _get_line_(self, arr)
+### \_get_line_(self, arr)
 
     
 
 
 
-### _mutate(self, positions)
+### \_mutate(self, positions)
 
     Goes through all positions given in parameters and apply a mutation. If       random.uniform(0, 1) <= config.mutate_inpd Do a mutation. Mutation can be       One of these 3 type: [mutate_position](#mutate_position)       [mutate_rotation](ind.md#rotates), mutation_position_rotation       (both at same time in this order).
     

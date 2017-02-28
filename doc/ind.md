@@ -9,7 +9,7 @@ Use to represent an individual a 4 int direction and a rotation. (and an uid to 
 
     
 
-### _mask_(self, mask, c_index=0)
+### \_mask_(self, mask, c_index=0)
 
     return True if the mask is ok with the content
 
