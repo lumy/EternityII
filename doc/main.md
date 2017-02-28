@@ -25,7 +25,7 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 main function will load a new population or an old one and run it with our     [Current Algorithm](doc/Algorithm.md)
 
 
- - [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) write_stats: Should we be logging stats. Used during benchmark,   otherwise always set to True.
+- [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) write_stats: Should we be logging stats. Used during benchmark,   otherwise always set to True.
 - [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) old_pop: loading the old population saved at   config.population_file_saved
 - [float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex) timer: see [loop](doc/main.md#loop)
 - [int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex) nloop: see [loop](doc/main.md#loop)

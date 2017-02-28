@@ -22,7 +22,7 @@ Puzzle Description:
 
 
 
-  - lines:
+- lines:
   
 
 ### \_get_line_(self, arr)
