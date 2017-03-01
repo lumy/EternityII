@@ -94,6 +94,12 @@ def save(linds, file_path):
   pygame.image.save(screen, "%s.jpeg" % file_path)
   pygame.quit()
 
+__md__ = [
+  "save",
+  "draw",
+
+]
+
 if __name__ == '__main__':
   l = []
   with open("e2pieces.txt") as f:

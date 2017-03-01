@@ -107,6 +107,10 @@ def main(args):
     print "\ncomputing stats from benchmark records..."
     compute_stats_from_records()
 
+__md__ = [
+    "main"
+]
+
 if __name__ == '__main__':
     args = parse_arguments()
     main(args)

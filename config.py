@@ -62,3 +62,7 @@ def init():
 if not initialized:
     init()
     globals()["initialized"] = True
+
+__md__ = [
+    "init"
+]

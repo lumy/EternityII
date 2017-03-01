@@ -11,6 +11,10 @@ def init(g):
   stats.draw_all_eternity()
   stats.generate_graph_per_generations(saved=True, show=False)
 
+__md__ = [
+  "init"
+]
+
 if __name__ == '__main__':
   if len(sys.argv) <= 1:
     print "Usage: %s <./path_log>" % sys.argv[0]
