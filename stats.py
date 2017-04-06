@@ -132,6 +132,12 @@ def open_population(path):
       pass
   return ret
 
+__md__ = [
+  "Stats",
+  "open_logboox",
+  "open_population"
+]
+
 if __name__ == '__main__':
   import puzzle, sys
   puzzle.Puzzle.dynamique_type()
@@ -140,4 +146,3 @@ if __name__ == '__main__':
   for c, s in zip(cs, ss):
     print "C %s s %s c - s %s" % (c, s, c - s)
 
-#  print s.logbook

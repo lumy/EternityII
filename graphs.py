@@ -71,3 +71,7 @@ def generate_graph_all_data(generations, fits_ind, fits_group, saved, show, path
 
 def generate_all_score(fitnesses):
   pass
+
+__md__ = [
+  "generate_graph_all_data"
+]

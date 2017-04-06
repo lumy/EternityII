@@ -1,5 +1,5 @@
 """
-Use to represent an individual a 4 int direciton and a rotation. (and an uid to keep the line reference)
+Use to represent an individual a 4 int direction and a rotation. (and an uid to keep the line reference)
 """
 import copy
 
@@ -20,6 +20,7 @@ class Ind(object):
   def __init__(self, f, l):
     """
        The Individual reorganize the line in CLOCKWORK MOD (orange ?) so it can easily rotate them.
+
     :param uid: Represant the id of the tile for final printing
     :param line: Line in order North South Weast East.
     """
@@ -50,7 +51,7 @@ class Ind(object):
           return True if the mask is ok with the content
         :param mask: list of None and 0
         :return:
-        """
+    """
     def _mask(m, index, c):
       if c < 4:
         if index >= 4:
@@ -90,6 +91,10 @@ class Ind(object):
   def __repr__(self):
     return "n:%s e:%s s:%s w:%s" % (self.content[0], self.content[1], self.content[2], self.content[3])
 
+__md__ = [
+  "get_population",
+  "Ind"
+]
 
 if __name__ == '__main__':
   i = Ind(lambda x: (0, [1, 0, 0, 17]), None)
