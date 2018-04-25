@@ -1,8 +1,14 @@
+"""
+Doc
+"""
 import puzzle
 from stats import open_logboox
 import sys
 
 def init(g):
+  """
+    Doc
+  """
   puzzle.Puzzle.dynamique_type()
   stats = open_logboox(g)
   stats.generate_stats_generations(ftype="avg")
@@ -12,6 +18,9 @@ def init(g):
   stats.generate_graph_per_generations(saved=True, show=False)
 
 __md__ = [
+  "init"
+]
+__all__ = [
   "init"
 ]
 

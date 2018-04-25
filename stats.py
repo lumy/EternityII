@@ -1,3 +1,6 @@
+"""
+  Statistics:
+"""
 import numpy, os, config, pickle, eternity, graphs
 from deap import tools
 import progressbar
@@ -133,6 +136,12 @@ def open_population(path):
   return ret
 
 __md__ = [
+  "Stats",
+  "open_logboox",
+  "open_population"
+]
+
+__all__ = [
   "Stats",
   "open_logboox",
   "open_population"

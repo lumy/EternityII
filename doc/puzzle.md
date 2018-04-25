@@ -27,7 +27,7 @@ Puzzle Description:
 
 ### \_get_line_(self, arr)
 
-
+Docu
 
 
 
@@ -156,7 +156,7 @@ return the [mask](doc/mask.md) for a given index
 
 ### give_random_pos(self, pos, line)
 
-
+Docu
 
 
 
@@ -255,7 +255,7 @@ Remove all connection < 4 and group_value < average_group_value
 
 ### set_individual_best_mask(self, ind, pos, mask)
 
-
+Doc
 
 
 

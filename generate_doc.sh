@@ -1,4 +1,5 @@
 #!/bin/bash
+set -ex
 
 doc2md.py -a --no-toc main.py > doc/main.md
 doc2md.py -a --no-toc algo_benchmark.py > doc/algo_benchmark.md

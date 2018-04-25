@@ -1,11 +1,18 @@
 # eval
 
-
+Doc
 
 
 
 
 # Functions
+
+
+### eval_individual_score(population, index)
+
+Doc
+
+
 
 
 ### eval_solution(population)
@@ -57,4 +64,11 @@ Retrieve the individual's neighbor from coordinates and direction
 - direction: lookup direction from individual's po[int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex) of view: NORTH || EAST || SOUTH || WEST
 
 - return neighbor: found neighbor or `None`
+
+
+
+### init_virgin_scores_list()
+
+Doc
+
 

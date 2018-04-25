@@ -1,3 +1,6 @@
+"""
+  Doc
+"""
 from __future__ import print_function
 import copy
 
@@ -12,9 +15,10 @@ virgin_score_list = []
 
 # UNCOOL
 def init_virgin_scores_list():
-  del virgin_score_list[:]
-  for index in range(0, config.total):
-      virgin_score_list.append(None);
+  """
+    Doc
+  """
+  virgin_score_list = [None] * config.total
 
 init_virgin_scores_list()
 def get_individual_neighbor(population, index, x, y, direction):
@@ -137,6 +141,9 @@ def eval_solution(population):
   return (individuals_score, individuals_cluster_score, puzzle_completion, connections_completion, nb_individuals_per_ind_score)
 
 def eval_individual_score(population, index):
+  """
+    Doc
+  """
   individual = population[index]
   x = index % config.size_line
   y = index / config.size_line
@@ -163,4 +170,12 @@ __md__ = [
   "eval_individual",
   "get_individual_neighbor",
   "init_virgin_scores_list",
+]
+
+__all__ = [
+  "eval_individual_score",
+  "eval_solution",
+  "eval_individual",
+  "get_individual_neighbor",
+  "init_virgin_scores_list"
 ]

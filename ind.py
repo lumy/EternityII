@@ -96,6 +96,11 @@ __md__ = [
   "Ind"
 ]
 
+__all__ = [
+  "get_population",
+  "Ind",
+  ]
+
 if __name__ == '__main__':
   i = Ind(lambda x: (0, [1, 0, 0, 17]), None)
 

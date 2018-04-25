@@ -1,3 +1,7 @@
+"""
+  Documentation:
+    to be removed
+"""
 from multiprocessing import Process
 import argparse
 import datetime
@@ -15,6 +19,9 @@ running_processes_pool = []
 resolution_time_records = []
 
 def parse_arguments():
+    """
+      Documentation
+    """
     parser = argparse.ArgumentParser(description='Eternity II algortihm benchmarking')
     parser.add_argument('--nb-parallel-executions', type=int,
                         default=DEFAULT_NB_PARALLEL_EXECUTIONS,
@@ -25,14 +32,23 @@ def parse_arguments():
     return parser.parse_args()
 
 def prepare_grid_benchmark(input_grid, nb_executions):
+    """
+      Documentation
+    """
     for i in range(nb_executions):
         process = Process(target=algorithm.main, args=(False,), kwargs={'old_pop':False, 'timer':None, 'nloop':config.NGEN, 'timed':False, 'input_grid':input_grid})
         processes_pool.append((process, input_grid))
 
 def record_process_start():
+    """
+      Documentation
+    """
     resolution_time_records.append(datetime.datetime.now())
 
 def record_process_end(process_index):
+    """
+      Documentation
+    """
     current_time = datetime.datetime.now()
     start_time = resolution_time_records[process_index]
     resolution_time = current_time - start_time
@@ -40,6 +56,9 @@ def record_process_end(process_index):
     print process_index, "\t|", processes_pool[process_index][1], "\t| resolution time:", resolution_time
 
 def find_ended_processes(nb_current_executions):
+    """
+      Documentation
+    """
     for process_index in running_processes_pool:
         if not processes_pool[process_index][0].is_alive():
             record_process_end(process_index)
@@ -48,6 +67,9 @@ def find_ended_processes(nb_current_executions):
     return nb_current_executions
 
 def launch_benchmark(nb_executions):
+    """
+      Documentation
+    """
     nb_current_executions = 0
     for i, process_data in enumerate(processes_pool):
         process = process_data[0]
@@ -67,6 +89,9 @@ def launch_benchmark(nb_executions):
         time.sleep(0.01)
 
 def compute_stats_from_records():
+    """
+      Documentation
+    """
     input_grids = []
     for resolution_time, input_grid in resolution_time_records:
         if not input_grid in input_grids:
@@ -94,6 +119,9 @@ def compute_stats_from_records():
         print input_grid, "\t| min:", min, "avg:", avg, "max:", max
 
 def main(args):
+    """
+      Documentation
+    """
     print "nb_parallel_executions", args.nb_parallel_executions
     print "nb_executions_per_grid_size", args.nb_executions_per_grid_size
     prepare_grid_benchmark("test_4pieces.txt", args.nb_executions_per_grid_size)
@@ -105,10 +133,16 @@ def main(args):
     print "\ncomputing stats from benchmark records..."
     compute_stats_from_records()
 
+__all__ = [
+    "main"
+]
 __md__ = [
     "main"
 ]
 
 if __name__ == '__main__':
+    """
+      Doc
+    """
     args = parse_arguments()
     main(args)

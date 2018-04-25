@@ -1,3 +1,7 @@
+"""
+  Configuration:
+    can be reloaded at runtime.
+"""
 import math
 
 IMG="./Eternity/"
@@ -38,6 +42,9 @@ inside_pos = []
 score_group_max = 0
 
 def count_nb_pieces():
+    """
+      Doc
+    """
     nb_pieces = 0
     with open(population_file_base) as f:
         for i, line in enumerate(f):
@@ -45,9 +52,15 @@ def count_nb_pieces():
     return nb_pieces
 
 def deduce_line_size():
+    """
+      Doc
+    """
     return int(round(math.sqrt(count_nb_pieces())))
 
 def init():
+    """
+      Doc
+    """
     globals()["size_line"] = deduce_line_size()
     globals()["total"] = size_line * size_line
     globals()["corner_pos"] = [0, size_line - 1, total - size_line, total - 1]
@@ -63,6 +76,8 @@ if not initialized:
     init()
     globals()["initialized"] = True
 
+__all__ = [ "init"
+]
 __md__ = [
     "init"
 ]
