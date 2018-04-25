@@ -1,9 +1,10 @@
+"""
+  timed loop:
+    to be removed
+"""
 import timeit
-
 import time
-
 import datetime
-
 import config
 
 def _timed_loop(puzzle, write_stats, one_turn, nloop=None, timer=None):

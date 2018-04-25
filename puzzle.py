@@ -247,6 +247,9 @@ class Puzzle(object):
     return [_get_mask(eval.NORTH, 2),_get_mask(eval.EAST, 3), _get_mask(eval.SOUTH, 0), _get_mask(eval.WEST, 1)]
 
   def set_individual_best_mask(self, ind, pos, mask):
+    """
+      Doc
+    """
     t = [ind._mask_(mask, c_index=0), ind._mask_(mask, c_index=1), ind._mask_(mask, c_index=2),
          ind._mask_(mask, c_index=3)]
     ind.rotates(t.index(max(t)))
@@ -362,11 +365,17 @@ class Puzzle(object):
 
   # Init Functions
   def _get_line_(self, arr):
+    """
+      Docu
+    """
     i = self.index_line
     self.index_line += 1
     return arr[i]
 
   def give_random_pos(self, pos, line):
+    """
+      Docu
+    """
     r = []
     for x in range(0, len(pos)):
       rp =  random.randrange(0, len(pos))
@@ -435,15 +444,22 @@ class Puzzle(object):
     self.stats.draw_all_eternity()
 
   def __len__(self):
+    """Len
+    """
     return len(self.population)
 
   def __repr__(self):
+    """repr
+    """
     return repr(self.personal_path)
 
 
 __md__ = [
   'Puzzle'
 ]
+__all__ = [
+  'Puzzle'
+  ]
 
 if __name__ == '__main__':
   import ind

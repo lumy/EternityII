@@ -4,3 +4,4 @@ matplotlib
 dill
 pygame # Drawing the scene without java
 progressbar
+-e git+git@github.com:lumy/doc2md.git#egg=doc2md

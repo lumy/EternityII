@@ -1,3 +1,6 @@
+"""
+Docu
+"""
 import matplotlib.pyplot as plt
 
 import config
@@ -70,8 +73,15 @@ def generate_graph_all_data(generations, fits_ind, fits_group, saved, show, path
   # plt.xlabel("population generation(%s)" % generation)
 
 def generate_all_score(fitnesses):
-  pass
+    """
+      Doc
+    """
+    pass
 
 __md__ = [
   "generate_graph_all_data"
 ]
+
+__all__ = [
+  "generate_graph_all_data",
+  ]
