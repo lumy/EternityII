@@ -20,9 +20,9 @@ Or ```python main.py -l [num_loop] -t [min_loop] --old-pop --timed```
 # Functions
 
 
-### main(write_stats, old_pop=False, timer=None, nloop=None, timed=False)
+### main(write_stats, old_pop=False, timer=None, nloop=None, timed=False, input_grid=None)
 
-main function will load a new population or an old one and run it with our     [Current Algorithm](doc/Algorithm.md)
+main function will load a new population or an old one and run it.
 
 
 - [bool](https://docs.python.org/2/library/stdtypes.html#boolean-values) write_stats: Should we be logging stats. Used during benchmark,   otherwise always set to True.
@@ -30,6 +30,10 @@ main function will load a new population or an old one and run it with our     [
 - [float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex) timer: see [loop](doc/main.md#loop)
 - [int](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-[float](https://docs.python.org/2/library/stdtypes.html#numeric-types-int-float-long-complex)-long-complex) nloop: see [loop](doc/main.md#loop)
 - timed: that will activate some timer, to calculate how many time for one iteration and for the whole iteration.
+- [str](https://docs.python.org/2/library/stdtypes.html#sequence-types-str-unicode-[list](https://docs.python.org/2/tutorial/datastructures.html#more-on-lists)-tuple-bytearray-buffer-xrange) input_grid: path to the text file to load
+
+- return:
+ 
 
 
 

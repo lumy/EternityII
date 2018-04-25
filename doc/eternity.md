@@ -8,6 +8,13 @@ Package use for drawing the game
 # Functions
 
 
+### save(linds, file_path)
+
+Doc
+
+
+
+
 ### draw(linds)
 
 Function to call when u want to show the Puzzle.
