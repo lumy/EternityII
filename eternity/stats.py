@@ -58,6 +58,9 @@ class Stats(object):
     # I case we need to keep famous big scores.
     # self.famous.update(self.pop)
 
+  def get_last_stats(self):
+    return (self.logbook[-1], print self.populations[-1])
+
   def write_logbook(self, bin=False):
     """
       The binary mode save All the data, so if you want create Graph you need to have a pckl Log book as much as

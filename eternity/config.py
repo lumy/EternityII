@@ -8,7 +8,7 @@ IMG="./Eternity/"
 
 population_file_saved="try01.dill"
 
-population_file_base="e2pieces.txt"
+population_file_base="./eternity/e2pieces.txt"
 
 # NGEN % gen_modulo_elitism : 2000 / 100 = 20
 # 20 * elitism_percentage_up : 20 * 4 = 80
