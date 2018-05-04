@@ -11,7 +11,7 @@
   ```--time|-t``` Maximum time to execute the loop in min, if not set will not \
   be used to stop the loop (default: None).
 
-  ```--timed``` iteration and loop would be timed. (not really usefull).
+  ```--timed``` iteration and loop would be timed. (not really usefull). # Deprecated
 
   ```--old-pop|-o``` Load an old population. path is set in config file at \
   config.population_file_saved.
@@ -20,7 +20,6 @@ import argparse
 import os
 import time
 import datetime
-import timed_loop
 import dill
 import ind
 import puzzle
@@ -176,21 +175,12 @@ def main(write_stats, old_pop=False, timer=None, nloop=None, timed=False, input_
   :param str input_grid: path to the text file to load
   :return:
   """
-  if input_grid != None:
-    config.population_file_base = input_grid
-    config.init()
-    import eval
-    reload(eval)
-
   try:
     os.mkdir("./gen/")
   except Exception as e:
     pass
   puzzle = load_population(old_pop)
-  if timed:
-    timed_loop.timed_loop(puzzle, write_stats, (one_turn, save_population), timer=timer, nloop=nloop)
-  else:
-    loop(puzzle, write_stats, timer=timer, nloop=nloop)
+  loop(puzzle, write_stats, timer=timer, nloop=nloop)
 
 def get_args():
   """
@@ -205,8 +195,6 @@ def get_args():
                       help='Number of loop maximum to do. if set to -1 infinite loop (use time to stop) (default: config.NGEN %s)' % config.NGEN)
   parser.add_argument('--time', '-t', action='store', default=None,
                       help='Maximum time to execute the loop in min')
-  parser.add_argument('--timed', action='store_true', default=False,
-                      help='iteration and loop would be timed. benchmark.')
   parser.add_argument('--old-pop', '-o', action='store_true', default=False,
                       help='Load an old population. path is set in config file current is @%s.' % config.population_file_saved)
   args = parser.parse_args()
@@ -214,8 +202,8 @@ def get_args():
 
 if __name__ == '__main__':
   kwargs = get_args()
-  main(True, old_pop=kwargs.old_pop, timed=kwargs.timed,
-       timer=None if kwargs.time is None else float(kwargs.time),
+  main(True, old_pop=kwargs.old_pop,
+          timer=None if kwargs.time is None else float(kwargs.time),
        nloop=int(kwargs.loop))
 
 __md__ = [ # Order of appearance in the documentation
