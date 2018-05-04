@@ -1,5 +1,6 @@
 
 *.py text eol=lf
 *.txt text eol=lf
+*.sql text eol=lf
 .gitignores text eol=lf
 .gitattributes text eol=lf
