@@ -4,3 +4,8 @@
 *.sql text eol=lf
 .gitignores text eol=lf
 .gitattributes text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.gulp text eol=lf
+*.scss text eol=lf

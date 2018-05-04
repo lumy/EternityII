@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-from flask import Flask, session, redirect
+from flask import Flask, session, redirect, url_for, render_template
 from db import close_db, init_db
 import auth
 import dashboard
@@ -37,7 +37,11 @@ def create_app(test_config=None, env="production"):
 
 # a simple page that says hello
 def hello():
-  return redirect("dashboard.index") if "user_id" in session else  redirect("auth.login")
+  print "user_logged" in session
+  print session.get("user_logged")
+  r= redirect(url_for("dashboard.index")) if "user_logged" in session else  redirect(url_for("auth.login"))
+  print r.__dict__
+  return redirect(url_for("dashboard.index")) if "user_logged" in session else  redirect(url_for("auth.login"))
 
 if __name__ == '__main__':
   from os import environ as env
@@ -45,6 +49,7 @@ if __name__ == '__main__':
   host = env.get("HOST", "localhost")
   port = env.get("PORT", 5000)
   debug = env.get("DEBUG", True)
-
+  with app.app_context():
+    init_db(None)
   app.run(host=host, port=5000, debug=debug)
          

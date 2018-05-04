@@ -26,8 +26,6 @@ def register():
           (username, generate_password_hash(password))
       )
       db.commit()
-      r = db.execute("SELECT * FROM user WHERE username = 'a'").fetchone()
-      print r[0], r[1], r[2]
       return redirect(url_for('auth.login'))
 
     flash(error)
@@ -50,8 +48,8 @@ def login():
 
     if error is None:
       session.clear()
-      session['user_id'] = user['id']
-      return redirect(url_for('index'))
+      session['user_logged'] = user['id']
+      return redirect(url_for('dashboard.index'))
 
     flash(error)
 
@@ -59,7 +57,7 @@ def login():
 
 @blueprint.before_app_request
 def load_logged_in_user():
-  user_id = session.get('user_id')
+  user_id = session.get('user_logged')
 
   if user_id is None:
     g.user = None

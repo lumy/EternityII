@@ -1,7 +1,10 @@
 *.pyc
+*~
+*\#
 .pytest*
 .idea
 gen/*
 Eternity
 *.dill
 *instance*
+node_modules
