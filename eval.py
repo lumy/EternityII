@@ -11,16 +11,8 @@ EAST = 1
 SOUTH = 2
 WEST = 3
 
-virgin_score_list = []
+virgin_score_list = [None] * config.total
 
-# UNCOOL
-def init_virgin_scores_list():
-  """
-    Doc
-  """
-  virgin_score_list = [None] * config.total
-
-init_virgin_scores_list()
 def get_individual_neighbor(population, index, x, y, direction):
   """
     Retrieve the individual's neighbor from coordinates and direction
