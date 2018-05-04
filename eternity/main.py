@@ -25,6 +25,7 @@ import ind
 import puzzle
 import config
 import algo
+import tools
 
 def main(write_stats, old_pop=False, timer=None, nloop=None, timed=False, input_grid=None):
   """
@@ -44,7 +45,7 @@ def main(write_stats, old_pop=False, timer=None, nloop=None, timed=False, input_
     os.mkdir("./gen/")
   except Exception as e:
     pass
-  puzzle = algo.load_population(old_pop)
+  puzzle = tools.load_population(old_pop)
   algo.loop(puzzle, write_stats, timer=timer, nloop=nloop)
 
 def get_args():

@@ -59,7 +59,7 @@ class Stats(object):
     # self.famous.update(self.pop)
 
   def get_last_stats(self):
-    return (self.logbook[-1], print self.populations[-1])
+    return (self.logbook[-1], self.populations[-1])
 
   def write_logbook(self, bin=False):
     """
