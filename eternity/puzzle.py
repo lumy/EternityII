@@ -7,7 +7,6 @@ import random
 import copy
 import os
 import config
-import eternity
 import eval
 import stats
 from ind import Ind
@@ -423,12 +422,14 @@ class Puzzle(object):
     """
       See [@eternity file](doc/eternity.md#save)
 
+    Deprecated
     :param gen:
     :param score:
     :return:
     """
-    eternity.save(self.population,
-                  "%s/gen_%s_score_%s" % (self.personal_path, gen, score))
+    raise NotImplemented
+#    eternity.save(self.population,
+#                  "%s/gen_%s_score_%s" % (self.personal_path, gen, score))
 
   def draw_generation(self, n):
     """

@@ -1,5 +1,7 @@
 """
-Docu
+Docu: generate graphs
+
+Deprecated, it's gonna be done in the webui.
 """
 import matplotlib.pyplot as plt
 

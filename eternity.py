@@ -1,5 +1,7 @@
 """
 Package use for drawing the game
+
+Deprecated: gonna be done in the webui
 """
 import os
 import pygame
