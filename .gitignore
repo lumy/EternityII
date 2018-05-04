@@ -2,3 +2,5 @@
 .idea
 gen/*
 Eternity
+*.dill
+
