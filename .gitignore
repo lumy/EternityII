@@ -1,4 +1,5 @@
 *.pyc
+.pytest*
 .idea
 gen/*
 Eternity
