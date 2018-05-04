@@ -65,7 +65,7 @@ class Puzzle(object):
 
   def __init__(self, lines):
     """
-    :param lines:
+    :param lines: the lines in order from the file e2pieces.txt
     """
     current_time = datetime.now().strftime("%d-%m-%Y_%Hh.%Mm.%Ss")
     user = getpass.getuser()
@@ -77,7 +77,7 @@ class Puzzle(object):
     try:
       os.mkdir(self.personal_path)
     except Exception as e:
-      print e
+      pass
     print "Personal Path used for this Puzzle: %s" % self.personal_path
 
     arr = list(self.randomize_lines(*lines))

@@ -191,9 +191,9 @@ def get_args():
   help="""Run a population with arguments and config file.
   """
   parser = argparse.ArgumentParser(description=help)
-  parser.add_argument('--loop', '-l', action='store', default=config.NGEN,
+  parser.add_argument('--loop', '-l', action='store', default=config.NGEN, type=int,
                       help='Number of loop maximum to do. if set to -1 infinite loop (use time to stop) (default: config.NGEN %s)' % config.NGEN)
-  parser.add_argument('--time', '-t', action='store', default=None,
+  parser.add_argument('--time', '-t', action='store', default=None, type=float,
                       help='Maximum time to execute the loop in min')
   parser.add_argument('--old-pop', '-o', action='store_true', default=False,
                       help='Load an old population. path is set in config file current is @%s.' % config.population_file_saved)
@@ -202,9 +202,7 @@ def get_args():
 
 if __name__ == '__main__':
   kwargs = get_args()
-  main(True, old_pop=kwargs.old_pop,
-          timer=None if kwargs.time is None else float(kwargs.time),
-       nloop=int(kwargs.loop))
+  main(True, old_pop=kwargs.old_pop, timer=kwargs.time, nloop=kwargs.loop)
 
 __md__ = [ # Order of appearance in the documentation
   'main',
