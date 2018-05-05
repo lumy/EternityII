@@ -5,6 +5,7 @@ from flask import Flask, session, redirect, url_for, render_template
 from db import close_db, init_db
 import auth
 import dashboard
+import api
 
 # create and configure the app
 def create_app(test_config=None, env="production"):
@@ -32,6 +33,7 @@ def create_app(test_config=None, env="production"):
   app.teardown_appcontext(close_db)
   app.register_blueprint(auth.blueprint)
   app.register_blueprint(dashboard.blueprint)
+  app.register_blueprint(api.blueprint)
 
   return app
 

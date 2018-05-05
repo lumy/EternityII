@@ -10,6 +10,7 @@ blueprint = flask.Blueprint('dashboard', __name__, url_prefix='/dashboard')
 def index():
   return flask.render_template('index.html')
 
+
 @blueprint.route('/test/<filename>', methods=('GET',))
 def test(filename):
   return flask.render_template("%s.html" % filename)
