@@ -20,10 +20,13 @@ def get_population():
   Load the basic Population from the file e2pieces.txt
   :return: a list of (UID:int, [schema:int, schema:int, schema:int, schema:int]
   """
-  with open(config.population_file_base) as f:
-    l = f.readlines()
-  l = [(x + 1, [int(i) for i in l[x].split()]) for x in range(0, len(l))]
-  return l
+  if getattr(get_population, 'lines', None) is None:
+    with open(config.population_file_base) as f:
+      l = f.readlines()
+    l = [(x + 1, [int(i) for i in l[x].split()]) for x in range(0, len(l))]
+    setattr(get_population, 'lines', l)
+  return getattr(get_population, 'lines')
+
 
 
 class Ind(object):
