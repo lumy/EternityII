@@ -79,8 +79,13 @@ class Stats(object):
     self.write_logbook(bin=True)
     self.free_memory()
 
-  def free_memory(self):
-    pickle.dump(self.populations, open("%s/populations.pkl" % self.personal_path, "a"))
+  def free_memory(self, write_stats=False, write_db=True):
+    """
+      Deprecated: to not break anything these should save into file or db by looking at config
+    """
+    # can't do that anymore, should be logged into db.
+    #pickle.dump(self.populations, open("%s/populations.pkl" % self.personal_path, "a"))
+  
     self.populations = []
 
   def generate_graph_per_generations(self, saved=True, show=False):
