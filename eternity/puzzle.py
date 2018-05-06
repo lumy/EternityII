@@ -57,9 +57,11 @@ class Puzzle(object):
       Can be found at ```deap.creator.FitnessInd``` or \
       ```deap.creator.Individual```
     """
-    creator.create("FitnessInd", base.Fitness, weights=(1,))
-    creator.create("FitnessGroup", base.Fitness, weights=(1,))
-    creator.create("Individual", Ind, fitness_ind=creator.FitnessInd, fitness_group=creator.FitnessGroup)
+    if not getattr(Puzzle.dynamique_type, 'initialized', False):
+      creator.create("FitnessInd", base.Fitness, weights=(1,))
+      creator.create("FitnessGroup", base.Fitness, weights=(1,))
+      creator.create("Individual", Ind, fitness_ind=creator.FitnessInd, fitness_group=creator.FitnessGroup)
+      setattr(Puzzle.dynamique_type, 'initialized', True)
 
 
   def __init__(self, lines):
