@@ -6,7 +6,7 @@ import datetime
 import config
 import tools
 
-def one_turn(puzzle, generation, write_stats):
+def one_turn(puzzle, generation, **kwargs):
   """
     Represent One iteration of the Algorithm.
     Ex.
@@ -42,15 +42,14 @@ def one_turn(puzzle, generation, write_stats):
     # if config.mutate_inpd == 0.0005:
     #   config.mutate_inpd = 0.05
   #  return
-  if write_stats:
-    # If you want log the different data
-    puzzle.log_stats(generation, rm_tils, n_mutated)
+  # Always be logging
+  puzzle.log_stats(generation, rm_tils, n_mutated)
   if puzzle.population[0].fitness_group.values[0] == config.score_group_max:
     return True
   return False
 
 
-def loop(puzzle, write_stats, nloop=None, timer=None):
+def loop(puzzle, write_stats=False, timer=None, ngen=None, **kwargs):
   """
     This function loop with stopping conditions as set in params. Write the \
     logbook at the end of the run.
@@ -70,8 +69,8 @@ def loop(puzzle, write_stats, nloop=None, timer=None):
   if timer:
     end_time = time.time() + datetime.timedelta(minutes=timer).total_seconds()
 
-  while (nloop == -1 or iteration < nloop) and (end_time is None or time.time() < end_time):
-    if one_turn(puzzle, iteration, write_stats):
+  while (ngen == -1 or iteration < ngen) and (end_time is None or time.time() < end_time):
+    if one_turn(puzzle, iteration, **kwargs):
       if write_stats:
         puzzle.write_stats()
       return True
