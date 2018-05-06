@@ -39,10 +39,7 @@ def create_app(test_config=None, env="production"):
 
 # a simple page that says hello
 def hello():
-  print "user_logged" in session
-  print session.get("user_logged")
   r= redirect(url_for("dashboard.index")) if "user_logged" in session else  redirect(url_for("auth.login"))
-  print r.__dict__
   return redirect(url_for("dashboard.index")) if "user_logged" in session else  redirect(url_for("auth.login"))
 
 if __name__ == '__main__':
