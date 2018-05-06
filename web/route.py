@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import os
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(__file__, "../../")))
 from flask import Flask, session, redirect, url_for, render_template
 from db import close_db, init_db
 import auth
