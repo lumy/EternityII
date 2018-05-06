@@ -14,7 +14,7 @@ def test_set_config(client, auth):
       'select_medium': 65.0,
   }
   with client:
-    resp = client.get("/api/v1/config")
+    resp = client.post("/api/v1/init", data={'erase': True})
     assert resp.status_code == 200
     assert json.loads(resp.data)['ngen'] == 2000, resp.data
     resp = client.post("/api/v1/config", data=data)
@@ -29,7 +29,6 @@ def test_set_config(client, auth):
     assert resp_data['ngen'] == 2, "WTF"
     resp = client.post("/api/v1/run")
     assert resp.status_code == 200, resp.data
-    assert False == json.loads(resp.data)['solution_found']
     auth.logout()
 
 @pytest.mark.parametrize(('ngen', 'mi', ), (
